@@ -1,0 +1,6 @@
+.idea/
+*.iml
+*.ipr
+out/
+target/
+src/main/java/me/hikari/snakes/*
