@@ -1,0 +1,2 @@
+$ mvn clean compile test assambly:single
+$ java -jar target/snake_client-0.1.jar

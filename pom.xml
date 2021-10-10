@@ -7,6 +7,7 @@
   <groupId>me.hikari</groupId>
   <artifactId>snake_client</artifactId>
   <version>0.1</version>
+  <packaging>jar</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,6 +17,7 @@
     <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
 
     <protobuf.version>3.7.1</protobuf.version>
+    <lanterna.version>3.1.1</lanterna.version>
     <junit.version>4.12</junit.version>
   </properties>
 
@@ -26,6 +28,11 @@
       <version>${protobuf.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.googlecode.lanterna</groupId>
+      <artifactId>lanterna</artifactId>
+      <version>${lanterna.version}</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
@@ -34,18 +41,8 @@
   </dependencies>
 
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+    <pluginManagement>
       <plugins>
-        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
-        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.0.2</version>
-        </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven-compiler-plugin.version}</version>
@@ -55,16 +52,29 @@
           <version>2.22.1</version>
         </plugin>
         <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.2</version>
+          <artifactId>maven-assembly-plugin</artifactId>
           <configuration>
             <archive>
               <manifest>
-                <mainClass>me.hikari.Main</mainClass>
+                <mainClass>me.hikari.snakeclient.Main</mainClass>
               </manifest>
             </archive>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+            <appendAssemblyId>false</appendAssemblyId>
           </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
+
       </plugins>
     </pluginManagement>
     <plugins>
