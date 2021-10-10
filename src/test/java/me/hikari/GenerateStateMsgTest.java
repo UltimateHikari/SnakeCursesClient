@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import static me.hikari.snakes.SnakesProto.*;
 
-public class GenerateStateMsg {
+public class GenerateStateMsgTest {
     /** Генерирует пример сообщения с состоянием, соответствующим картинке example1.png */
     @Test
     public void testGenerateStateMsg() {
