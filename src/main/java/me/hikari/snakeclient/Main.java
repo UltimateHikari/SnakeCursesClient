@@ -1,5 +1,8 @@
 package me.hikari.snakeclient;
 
+import com.googlecode.lanterna.Symbols;
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -16,10 +19,10 @@ public class Main
         TextGraphics tg = screen.newTextGraphics();
         screen.startScreen();
 
-        tg.putString(10,10, "Hello world1");
+        tg.drawRectangle(new TerminalPosition(0,0), new TerminalSize(40,40), 'x');
+        tg.putString(10,10, screen.getTerminalSize().getRows() + " " + screen.getTerminalSize().getColumns());
         screen.refresh();
         screen.readInput();
         screen.stopScreen();
-        //System.out.println( "Hello World+1!" );
     }
 }
