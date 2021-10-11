@@ -1,11 +1,11 @@
-package me.hikari.snakeclient.data;
+package me.hikari.snakeclient.data.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class EngineConfig {
+public class EngineConfig implements UIConfig{
     private final Integer width;
     private final Integer height;
     private final Integer foodStatic;
