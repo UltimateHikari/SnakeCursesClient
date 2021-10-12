@@ -1,6 +1,6 @@
 package me.hikari.snakeclient.data;
 
-public enum Move {
+public enum Direction {
     RIGHT,
     UP,
     LEFT,

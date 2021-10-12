@@ -8,22 +8,29 @@ import java.util.List;
 
 public class Engine {
     private Integer stateOrder;
-    private EngineConfig config = new EngineConfig();
+    private EngineConfig config;
     //TODO list -> map
     private List<Snake> snakes = new ArrayList<>();
     private List<Player> players = new ArrayList<>();
     private List<Coord> foods = new ArrayList<>();
 
-    public Engine(){
+    public Engine(EngineConfig config){
+        this.config = config;
     }
     public void addPlayer(Player player){
         players.add(player);
     }
 
-    public void notePlayerMove(int id, Move move){
+    public void notePlayerMove(int id, Direction move){
     }
 
     public UIConfig getUIConfig(){
         return config;
+    }
+
+    public void applyMoves() {
+    }
+
+    public void moveSnakes() {
     }
 }

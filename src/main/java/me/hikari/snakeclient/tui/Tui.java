@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * screens:
- *  new game //TODO
- *  enter existing //TODO
- *  gamescreen
+ * new game //TODO
+ * enter existing //TODO
+ * gamescreen
  */
 
-public class Tui {
+public class Tui implements ConnectableUI {
     private static final long NO_DELAY = 0;
-    private Engine engine = new Engine(); //TODO delegate to game init controller
+    private Engine engine = null;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> currentScreenTask = null;
     private Screen screen;
@@ -34,7 +34,15 @@ public class Tui {
         screen.startScreen();
     }
 
-    public void showGameScreen(){
+    public void engineSubscribe(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void engineUnsubscribe() {
+        this.engine = null;
+    }
+
+    public void showGameScreen() {
         cancelCurrentScreen();
         currentScreenTask = scheduler.scheduleAtFixedRate(
                 new GameScreen(screen),
@@ -50,9 +58,9 @@ public class Tui {
         scheduler.shutdown();
     }
 
-    private void cancelCurrentScreen(){
+    private void cancelCurrentScreen() {
         screen.clear();
-        if(currentScreenTask != null){
+        if (currentScreenTask != null) {
             System.out.println("cancelling...");
             System.out.println(currentScreenTask.cancel(true));
         }
