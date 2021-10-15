@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class GameManager {
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> currentGame = null;
-    private Engine engine = null;
-    private List<ConnectableUI> subs = new ArrayList<>();
+
+    private Engine currentEngine = null;
 
     public void startGame(EngineConfig config) {
         engine = new Engine(config);

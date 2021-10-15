@@ -71,7 +71,7 @@ public class GameScreen implements Runnable{
         drawHeader(tg);
         drawField(tg);
         drawInfo(tg);
-        drawScores(tg);
+         (tg);
         screen.refresh();
     }
 }

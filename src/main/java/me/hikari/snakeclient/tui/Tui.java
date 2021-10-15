@@ -8,6 +8,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import lombok.RequiredArgsConstructor;
 import me.hikari.snakeclient.data.Engine;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class Tui implements ConnectableUI {
+    private static final long REFRESH_RATE_MS = 10;
     private static final long NO_DELAY = 0;
     private Engine engine = null;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -34,22 +36,18 @@ public class Tui implements ConnectableUI {
         screen.startScreen();
     }
 
-    public void engineSubscribe(Engine engine) {
-        this.engine = engine;
-    }
-
-    public void engineUnsubscribe() {
-        this.engine = null;
-    }
-
     public void showGameScreen() {
         cancelCurrentScreen();
         currentScreenTask = scheduler.scheduleAtFixedRate(
                 new GameScreen(screen),
                 NO_DELAY,
-                engine.getUIConfig().getStateDelayMs(),
+                Tui.REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS
         );
+    }
+
+    public void showMainScreen(){
+
     }
 
     public void close() throws IOException {

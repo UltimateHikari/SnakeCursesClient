@@ -1,8 +1,11 @@
 package me.hikari.snakeclient.tui;
 
-import me.hikari.snakeclient.data.Engine;
+import com.googlecode.lanterna.input.KeyStroke;
+import me.hikari.snakeclient.data.EngineGetter;
+import me.hikari.snakeclient.data.MetaEngineGetter;
 
 public interface ConnectableUI {
-    void engineSubscribe(Engine engine);
-    void engineUnsubscribe();
+    void showMainScreen(MetaEngineGetter engine);
+    void showGameScreen(EngineGetter engine);
+    KeyStroke getInput();
 }

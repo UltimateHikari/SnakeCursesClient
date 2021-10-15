@@ -15,4 +15,20 @@ public class Snake {
     public Snake(Direction direction, Coord head, Coord tailShift) {
         this(false, direction, Arrays.asList(head, tailShift));
     }
+
+    public Coord moveHead(){
+        return null;
+    }
+
+    public Coord dropTail(){
+        return null;
+    }
+
+    public void turnHead(Direction direction){
+        headDirection = direction;
+    }
+
+    public void showYourself(FieldRepresentation field){
+
+    }
 }
