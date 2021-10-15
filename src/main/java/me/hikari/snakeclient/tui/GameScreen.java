@@ -7,25 +7,18 @@ import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
+import java.io.IOException;
+
 @RequiredArgsConstructor
-public class GameScreen implements Runnable{
+public class GameScreen {
     private static final Integer HEADER_ROWS = 3;
     private static final Integer INFO_COLS = 20;
     private static final Integer INFO_ROWS = 10;
     private static final Integer HEADER_TEXT_ROW = 1;
 
     private final Screen screen;
+    //private final EventContainer;
     private TerminalSize size;
-
-    private void refreshDims(){
-        TerminalSize newSize = screen.doResizeIfNecessary();
-        if(newSize != null){
-            size = newSize;
-            screen.clear();
-        }else{
-            size = screen.getTerminalSize();
-        }
-    }
 
     private void drawHeader(TextGraphics tg){
         TerminalPosition pos = new TerminalPosition(0,0);
@@ -37,7 +30,6 @@ public class GameScreen implements Runnable{
         tg.putString(size.getColumns()/2 - data.length()/2, HEADER_TEXT_ROW,  data);
         tg.putString(pos, "Header");
     }
-
     private void drawField(TextGraphics tg) {
         TerminalPosition pos = new TerminalPosition(0,HEADER_ROWS);
         TuiUtils.drawFancyBoundary(
@@ -45,6 +37,7 @@ public class GameScreen implements Runnable{
                 pos,
                 new TerminalSize(size.getColumns() - INFO_COLS, size.getRows() - HEADER_ROWS));
         tg.putString(pos, "Field");
+        //TODO check on EventContainer
     }
     private void drawInfo(TextGraphics tg) {
         TerminalPosition pos = new TerminalPosition(size.getColumns() - INFO_COLS,HEADER_ROWS);
@@ -63,15 +56,13 @@ public class GameScreen implements Runnable{
         tg.putString(pos,"Highscores");
     }
 
-    @SneakyThrows
-    @Override
-    public void run() {
-        refreshDims();
+    public void show() throws IOException {
+        size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);
         drawField(tg);
         drawInfo(tg);
-         (tg);
+        drawScores(tg);
         screen.refresh();
     }
 }

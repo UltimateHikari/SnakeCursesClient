@@ -4,6 +4,7 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.screen.Screen;
 
 public class TuiUtils {
     public static void drawFancyBoundary(TextGraphics tg, TerminalPosition p, TerminalSize s){
@@ -21,5 +22,15 @@ public class TuiUtils {
         tg.setCharacter(downLeft, Symbols.DOUBLE_LINE_BOTTOM_LEFT_CORNER);
         tg.setCharacter(upRight, Symbols.DOUBLE_LINE_TOP_RIGHT_CORNER);
         tg.setCharacter(downRight, Symbols.DOUBLE_LINE_BOTTOM_RIGHT_CORNER);
+    }
+
+    public static TerminalSize refreshDims(Screen screen){
+        TerminalSize newSize = screen.doResizeIfNecessary();
+        if(newSize != null){
+            screen.clear();
+            return newSize;
+        }else{
+            return screen.getTerminalSize();
+        }
     }
 }
