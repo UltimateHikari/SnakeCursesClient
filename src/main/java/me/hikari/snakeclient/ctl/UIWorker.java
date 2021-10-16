@@ -13,7 +13,6 @@ public class UIWorker implements Runnable {
     @Override
     public void run() {
         try {
-            //TODO save current screen, clear if needed(or in TUI more appropriate)
             if (manager.getSynchronizer().isScreenMain()) {
                 manager.getUi().showMainScreen(manager.getGameList());
             } else {

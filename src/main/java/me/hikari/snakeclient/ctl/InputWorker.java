@@ -24,13 +24,13 @@ public class InputWorker implements Runnable{
         }
     }
 
-    private void tryHandleStroke(KeyStroke stroke) {
+    private void tryHandleStroke(KeyStroke stroke) throws IOException {
         switch (stroke.getCharacter()){
-            case 'q', 'e':
-                manager.getSynchronizer().switchActiveScreen();
+            case 'q': manager.close();
                 break;
-            default:
-                System.out.println(stroke.getCharacter());
+            case 'e': manager.getSynchronizer().switchActiveScreen();
+                break;
+            default: System.out.println(stroke.getCharacter());
         }
     }
 }

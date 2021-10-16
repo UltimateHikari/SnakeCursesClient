@@ -27,6 +27,7 @@ public class Tui implements PluggableUI {
     private static final long NO_DELAY = 0;
     private Screen screen;
 
+    private Object currentScreen = null;
     private final GameScreen gameScreen;
     private final MainScreen mainScreen;
 
@@ -38,17 +39,26 @@ public class Tui implements PluggableUI {
         screen.startScreen();
     }
 
+    @Override
     public void close() throws IOException {
         screen.stopScreen();
     }
 
     @Override
     public void showMainScreen(MetaEngineGetter engine) throws IOException {
+        if(currentScreen != mainScreen){
+            screen.clear();
+            currentScreen = mainScreen;
+        }
         mainScreen.show();
     }
 
     @Override
     public void showGameScreen(EngineGetter engine) throws IOException {
+        if(currentScreen != gameScreen){
+            screen.clear();
+            currentScreen = gameScreen;
+        }
         gameScreen.show();
     }
 
@@ -56,4 +66,5 @@ public class Tui implements PluggableUI {
     public KeyStroke getInput() throws IOException {
         return screen.readInput();
     }
+
 }

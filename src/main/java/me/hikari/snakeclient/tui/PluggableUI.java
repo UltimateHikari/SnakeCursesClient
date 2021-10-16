@@ -10,4 +10,5 @@ public interface PluggableUI {
     void showMainScreen(MetaEngineGetter engine) throws IOException;
     void showGameScreen(EngineGetter engine) throws IOException;
     KeyStroke getInput() throws IOException;
+    void close() throws IOException;
 }
