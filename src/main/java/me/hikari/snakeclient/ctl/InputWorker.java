@@ -13,7 +13,7 @@ public class InputWorker implements Runnable{
 
     @Override
     public void run() {
-        while(true){
+        while(!Thread.currentThread().isInterrupted()){
             try {
                 KeyStroke stroke = manager.getUi().getInput();
                 tryHandleStroke(stroke);

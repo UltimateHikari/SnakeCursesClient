@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class Snake {
@@ -14,6 +15,10 @@ public class Snake {
 
     public Snake(Direction direction, Coord head, Coord tailShift) {
         this(false, direction, Arrays.asList(head, tailShift));
+    }
+
+    public Snake(Snake s){
+        this(s.isZombie, s.headDirection, s.points.stream().collect(Collectors.toUnmodifiableList()));
     }
 
     public Coord moveHead(){

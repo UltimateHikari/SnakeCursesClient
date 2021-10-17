@@ -1,10 +1,9 @@
 package me.hikari.snakeclient.ctl;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.Engine;
-import me.hikari.snakeclient.data.MetaEngine;
-import me.hikari.snakeclient.data.Player;
+import me.hikari.snakeclient.data.*;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
 
@@ -22,9 +21,7 @@ public class GameManager /*implements ManagerDTO*/{
     private ScheduledFuture<?> currentGame = null;
     private List<ScheduledFuture<?>> handlers = new ArrayList<>();
 
-    @Getter
     private Engine currentEngine = null;
-    @Getter
     private MetaEngine gameList = new MetaEngine();
     @Getter
     private final PluggableUI ui;
@@ -51,6 +48,7 @@ public class GameManager /*implements ManagerDTO*/{
 
     public void startGame(EngineConfig config) {
         currentEngine = new Engine(config);
+
         handlers.add(scheduler.scheduleAtFixedRate(
                 new EngineWorker(currentEngine),
                 0,
@@ -59,13 +57,26 @@ public class GameManager /*implements ManagerDTO*/{
     }
 
     public void stopGame() {
-        currentGame.cancel(false);
+        currentGame.cancel(true);
         currentEngine = null;
     }
 
     public void close() throws IOException {
-        handlers.forEach(h -> h.cancel(false));
+        handlers.forEach(h -> h.cancel(true));
         scheduler.shutdown();
         ui.close();
+    }
+
+    public MetaEngineDTO getMetaDTO(){
+        return gameList.getDTO();
+    }
+
+    public EngineDTO getEngineDTO(){
+        if(currentEngine != null){
+            return currentEngine.getDTO();
+        }else{
+            // TODO mb throw exception on access error?
+            return null;
+        }
     }
 }

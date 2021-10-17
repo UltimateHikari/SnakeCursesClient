@@ -14,9 +14,9 @@ public class UIWorker implements Runnable {
     public void run() {
         try {
             if (manager.getSynchronizer().isScreenMain()) {
-                manager.getUi().showMainScreen(manager.getGameList());
+                manager.getUi().showMainScreen(manager.getMetaDTO());
             } else {
-                manager.getUi().showGameScreen(manager.getCurrentEngine());
+                manager.getUi().showGameScreen(manager.getEngineDTO());
             }
         } catch (IOException e) {
             e.printStackTrace();

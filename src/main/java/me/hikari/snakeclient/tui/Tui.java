@@ -5,15 +5,10 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import me.hikari.snakeclient.data.Engine;
-import me.hikari.snakeclient.data.EngineGetter;
-import me.hikari.snakeclient.data.MetaEngineGetter;
+import me.hikari.snakeclient.data.EngineDTO;
+import me.hikari.snakeclient.data.MetaEngineDTO;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * screens:
@@ -23,8 +18,6 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class Tui implements PluggableUI {
-    private static final long REFRESH_RATE_MS = 10;
-    private static final long NO_DELAY = 0;
     private Screen screen;
 
     private Object currentScreen = null;
@@ -45,7 +38,7 @@ public class Tui implements PluggableUI {
     }
 
     @Override
-    public void showMainScreen(MetaEngineGetter engine) throws IOException {
+    public void showMainScreen(MetaEngineDTO engine) throws IOException {
         if(currentScreen != mainScreen){
             screen.clear();
             currentScreen = mainScreen;
@@ -54,7 +47,7 @@ public class Tui implements PluggableUI {
     }
 
     @Override
-    public void showGameScreen(EngineGetter engine) throws IOException {
+    public void showGameScreen(EngineDTO engine) throws IOException {
         if(currentScreen != gameScreen){
             screen.clear();
             currentScreen = gameScreen;
