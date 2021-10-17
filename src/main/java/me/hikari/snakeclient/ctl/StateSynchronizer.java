@@ -13,6 +13,7 @@ enum FieldState {
 public class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;
     private FieldState state = FieldState.LATEST;
+    private NavDirection direction = NavDirection.NEUTRAL;
 
     public boolean isStateLagging() {
         return FieldState.LAGGING == state;
@@ -36,5 +37,19 @@ public class StateSynchronizer {
         } else {
             screen = ActiveScreen.MAIN;
         }
+    }
+
+    public NavDirection popNavDirection(){
+        var pop = direction;
+        direction = NavDirection.NEUTRAL;
+        return pop;
+    }
+
+    public void NavUp(){
+        direction = NavDirection.UP;
+    }
+
+    public void NavDown(){
+        direction = NavDirection.DOWN;
     }
 }

@@ -5,6 +5,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import me.hikari.snakeclient.ctl.NavDirection;
 import me.hikari.snakeclient.data.EngineDTO;
 import me.hikari.snakeclient.data.MetaEngineDTO;
 
@@ -38,12 +39,12 @@ public class Tui implements PluggableUI {
     }
 
     @Override
-    public void showMainScreen(MetaEngineDTO engine) throws IOException {
+    public void showMainScreen(MetaEngineDTO engine, NavDirection navDirection) throws IOException {
         if(currentScreen != mainScreen){
             screen.clear();
             currentScreen = mainScreen;
         }
-        mainScreen.show();
+        mainScreen.show(engine, navDirection);
     }
 
     @Override

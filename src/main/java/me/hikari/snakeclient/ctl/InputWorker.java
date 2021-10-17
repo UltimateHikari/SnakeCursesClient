@@ -6,18 +6,19 @@ import me.hikari.snakeclient.data.Engine;
 
 import java.io.IOException;
 import java.util.function.Supplier;
+
 @RequiredArgsConstructor
-public class InputWorker implements Runnable{
+public class InputWorker implements Runnable {
     //TODO get back to synchronizer & supplier<KeyStroke>
     private final GameManager manager;
 
     @Override
     public void run() {
-        while(!Thread.currentThread().isInterrupted()){
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 KeyStroke stroke = manager.getUi().getInput();
                 tryHandleStroke(stroke);
-                System.out.println(stroke.getCharacter() + " " + stroke.getEventTime());
+                //System.err.println(stroke.getCharacter() + " " + stroke.getEventTime());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -25,12 +26,21 @@ public class InputWorker implements Runnable{
     }
 
     private void tryHandleStroke(KeyStroke stroke) throws IOException {
-        switch (stroke.getCharacter()){
-            case 'q': manager.close();
+        switch (stroke.getCharacter()) {
+            case 'j':
+                manager.getSynchronizer().NavDown();
                 break;
-            case 'e': manager.getSynchronizer().switchActiveScreen();
+            case 'k':
+                manager.getSynchronizer().NavUp();
                 break;
-            default: System.out.println(stroke.getCharacter());
+            case 'q':
+                manager.close();
+                break;
+            case 'e':
+                manager.getSynchronizer().switchActiveScreen();
+                break;
+            default:
+                System.err.println(stroke.getCharacter());
         }
     }
 }

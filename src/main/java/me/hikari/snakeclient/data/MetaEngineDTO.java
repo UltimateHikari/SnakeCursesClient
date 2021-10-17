@@ -9,5 +9,6 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class MetaEngineDTO {
+    private final EngineConfig defaultConfig;
     private final Set<EngineConfig> configs;
 }

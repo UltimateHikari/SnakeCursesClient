@@ -19,7 +19,7 @@ public class MetaEngine{
             if(!isLatest) {
                 config = new TreeSet<>(games.keySet());
                 isLatest = true;
-                dto = new MetaEngineDTO(config);
+                dto = new MetaEngineDTO(new EngineConfig(), config);
             }
             return dto;
         }
