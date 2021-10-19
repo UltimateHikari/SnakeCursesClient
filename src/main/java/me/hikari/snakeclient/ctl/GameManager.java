@@ -34,7 +34,7 @@ public class GameManager /*implements ManagerDTO*/{
                 0,
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
-        handlers.add(scheduler.scheduleAtFixedRate(
+        handlers.add(scheduler.scheduleWithFixedDelay(
                 new InputWorker(this),
                 0,
                 UI_REFRESH_RATE_MS,
@@ -44,7 +44,7 @@ public class GameManager /*implements ManagerDTO*/{
     public GameManager(PluggableUI ui){
         this.ui = ui;
         startWorkers();
-        gameList.addGame(new EngineConfig());
+        gameList.addGame(new Player("vasya", 1), new EngineConfig());
     }
 
     public void startGame(EngineConfig config) {

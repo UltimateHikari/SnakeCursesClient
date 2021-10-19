@@ -27,6 +27,7 @@ public class InputWorker implements Runnable {
 
     private void tryHandleStroke(KeyStroke stroke) throws IOException {
         switch (stroke.getCharacter()) {
+            //TODO move magic keys to config class
             case 'j':
                 manager.getSynchronizer().NavDown();
                 break;

@@ -20,7 +20,7 @@ public class StateSynchronizer {
     }
 
     public boolean isScreenMain() {
-        return ActiveScreen.MAIN == screen;
+        return screen == ActiveScreen.MAIN;
     }
 
     public synchronized void switchFieldState() {

@@ -7,6 +7,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
 import me.hikari.snakeclient.ctl.NavDirection;
+import me.hikari.snakeclient.data.GameEntry;
 import me.hikari.snakeclient.data.MetaEngineDTO;
 import me.hikari.snakeclient.data.config.EngineConfig;
 
@@ -25,7 +26,7 @@ public class MainScreen {
     //private final EventContainer;
     private TerminalSize size;
     private int listCursorPosition = 0;
-    private EngineConfig chosenConfig;
+    private GameEntry chosenConfig;
 
     private void moveListCirsor(int listSize, NavDirection direction) {
         switch (direction) {
@@ -56,19 +57,22 @@ public class MainScreen {
         screen.refresh();
     }
 
-    private String getConfigName(EngineConfig config) {
+    private String getConfigName(GameEntry c) {
         //TODO host & player name
-        return config.getWidth() + "x" + config.getHeight() + ": " + config.getFoodStatic();
+        return c.getPlayer().getName() +
+                " " + c.getConfig().getWidth() +
+                "x" + c.getConfig().getHeight() +
+                ": " + c.getConfig().getFoodStatic();
     }
 
-    private void putTextWithCursor(TextGraphics tg, TerminalPosition pos, int configRowShift, EngineConfig e, String prefix){
+    private void putTextWithCursor(TextGraphics tg, TerminalPosition pos, int configRowShift, GameEntry e, String prefix) {
         if (listCursorPosition == configRowShift) {
             chosenConfig = e;
             tg.putString(
                     pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT + configRowShift),
                     prefix + getConfigName(e), SGR.BLINK
             );
-        }else {
+        } else {
             tg.putString(
                     pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT + configRowShift),
                     prefix + getConfigName(e)
@@ -85,7 +89,7 @@ public class MainScreen {
         tg.putString(pos, "Join Game");
         int configRowShift = 0;
         putTextWithCursor(tg, pos, configRowShift, dto.getDefaultConfig(), NEW_GAME);
-        for (EngineConfig e : dto.getConfigs()) {
+        for (GameEntry e : dto.getConfigs()) {
             configRowShift++;
             putTextWithCursor(tg, pos, configRowShift, e, "");
         }
@@ -98,12 +102,12 @@ public class MainScreen {
                 pos,
                 new TerminalSize(CONFIG_COLS, size.getRows() - HEADER_ROWS));
         tg.putString(pos, "Game config");
-        tg.putString(pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT), getFullConfig(chosenConfig));
+        tg.putString(pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT), getFullChosenConfig());
     }
 
-    private String getFullConfig(EngineConfig chosenConfig) {
+    private String getFullChosenConfig() {
         //TODO verbosity
-        return getConfigName(chosenConfig);
+        return getConfigName(chosenConfig) + System.lineSeparator() + getConfigName(chosenConfig);
     }
 
     private void drawHeader(TextGraphics tg) {

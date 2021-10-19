@@ -8,27 +8,28 @@ import java.util.stream.Collectors;
 public class MetaEngine{
     private final static Integer GAME_KEEP_ALIVE_MS = 5000;
     private final Object mapMonitor = new Object();
-    private Map<EngineConfig, Long> games = new HashMap<>();
+    private Map<GameEntry, Long> games = new HashMap<>();
 
     private boolean isLatest = false;
     private MetaEngineDTO dto;
 
     public MetaEngineDTO getDTO() {
-        Set<EngineConfig> config;
+        Set<GameEntry> config;
         synchronized (mapMonitor) {
             if(!isLatest) {
-                config = new TreeSet<>(games.keySet());
+                config = new HashSet<>(games.keySet());
                 isLatest = true;
-                dto = new MetaEngineDTO(new EngineConfig(), config);
+                System.err.println(config);
+                dto = new MetaEngineDTO(new GameEntry(new Player(), new EngineConfig()), config);
             }
             return dto;
         }
     }
 
-    public void addGame(EngineConfig config) {
+    public void addGame(Player player, EngineConfig config) {
         synchronized (mapMonitor) {
             long time = System.currentTimeMillis();
-            games.put(config, time);
+            games.put(new GameEntry(player, config), time);
             isLatest = false;
         }
     }
