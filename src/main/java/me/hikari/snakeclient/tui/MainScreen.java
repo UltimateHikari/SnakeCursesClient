@@ -29,6 +29,7 @@ public class MainScreen {
     private GameEntry chosenConfig;
 
     private void moveListCirsor(int listSize, NavDirection direction) {
+        var curCursorPosition = listCursorPosition;
         switch (direction) {
             case UP:
                 listCursorPosition--;
@@ -44,6 +45,9 @@ public class MainScreen {
         }
         if (listCursorPosition >= listSize) {
             listCursorPosition %= listSize;
+        }
+        if(listCursorPosition != curCursorPosition){
+            screen.clear();
         }
     }
 
@@ -96,18 +100,23 @@ public class MainScreen {
     }
 
     private void drawConfig(TextGraphics tg) {
-        TerminalPosition pos = new TerminalPosition(CONFIG_COLS, HEADER_ROWS);
+        TerminalPosition pos = new TerminalPosition(size.getColumns() - CONFIG_COLS, HEADER_ROWS);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
                 new TerminalSize(CONFIG_COLS, size.getRows() - HEADER_ROWS));
         tg.putString(pos, "Game config");
-        tg.putString(pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT), getFullChosenConfig());
+        TerminalPosition text = pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT);
+        putFullChosenConfig(tg, text);
     }
 
-    private String getFullChosenConfig() {
-        //TODO verbosity
-        return getConfigName(chosenConfig) + System.lineSeparator() + getConfigName(chosenConfig);
+    private void putFullChosenConfig(TextGraphics tg, TerminalPosition pos) {
+        tg.putString(pos.withRelative(0, 0), getName());
+        tg.putString(pos.withRelative(0, 1), getIP());
+        tg.putString(pos.withRelative(0, 2), getDims());
+        tg.putString(pos.withRelative(0, 3), getFood());
+        tg.putString(pos.withRelative(0, 4), getDelay());
+        tg.putString(pos.withRelative(0, 5), getDeadProb());
     }
 
     private void drawHeader(TextGraphics tg) {
@@ -120,4 +129,33 @@ public class MainScreen {
         tg.putString(size.getColumns() / 2 - data.length() / 2, HEADER_TEXT_ROW, data);
         tg.putString(pos, "Header");
     }
+
+    private String getName() {
+        return "Name: " + chosenConfig.getPlayer().getName();
+    }
+
+    private String getIP() {
+        return "Name: " + chosenConfig.getPlayer().getIp();
+    }
+
+    private String getDims() {
+        return "Dims: " +
+                chosenConfig.getConfig().getWidth() + "x" +
+                chosenConfig.getConfig().getHeight();
+    }
+
+    private String getFood() {
+        return "Food: " +
+                chosenConfig.getConfig().getFoodStatic() +
+                " + " + chosenConfig.getConfig().getFoodPerPlayer() + "p";
+    }
+
+    private String getDelay(){
+        return "State delay: " + chosenConfig.getConfig().getStateDelayMs();
+    }
+
+    private String getDeadProb(){
+        return "Dead prob: " + chosenConfig.getConfig().getDeadFoodProb();
+    }
+
 }

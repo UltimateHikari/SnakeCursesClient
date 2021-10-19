@@ -9,9 +9,10 @@ import lombok.RequiredArgsConstructor;
 public class Player {
     private final String name;
     private final Integer id;
+    private final String ip;
     private Integer score = 0;
     //color
     public Player(){
-        this("host", 0);
+        this("host", 0, "localhost");
     }
 }

@@ -44,7 +44,7 @@ public class GameManager /*implements ManagerDTO*/{
     public GameManager(PluggableUI ui){
         this.ui = ui;
         startWorkers();
-        gameList.addGame(new Player("vasya", 1), new EngineConfig());
+        gameList.addGame(new Player("dummy", 1, "255.255.255.255"), new EngineConfig());
     }
 
     public void startGame(EngineConfig config) {
