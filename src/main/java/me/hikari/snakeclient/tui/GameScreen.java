@@ -5,7 +5,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.io.IOException;
 

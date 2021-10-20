@@ -6,10 +6,8 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.ctl.NavDirection;
 import me.hikari.snakeclient.data.GameEntry;
 import me.hikari.snakeclient.data.MetaEngineDTO;
-import me.hikari.snakeclient.data.config.EngineConfig;
 
 import java.io.IOException;
 
@@ -34,7 +32,7 @@ public class MainScreen {
         }
     }
 
-    public void show(MetaEngineDTO dto, NavDirection navDirection) throws IOException {
+    public void show(MetaEngineDTO dto) throws IOException {
         actualizeLastSelected(dto.getSelectedEntry());
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();

@@ -76,6 +76,7 @@ public class Engine {
             snakeMap.forEach((Player p, Snake s) -> {
                 list.add(new MoveResult(s.moveHead(), s));
             });
+            //TODO place snakes on field
             list.forEach((MoveResult m) -> {
                 if (field.isCellSnakeCollided(m.getCoord())) {
                     // TODO kill all stuff

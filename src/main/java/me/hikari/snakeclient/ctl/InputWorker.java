@@ -32,11 +32,9 @@ public class InputWorker implements Runnable {
             //TODO move magic keys to config class
             //TODO h for help on keys?
             case 'j':
-                state.navDown();
                 manager.navDown();
                 break;
             case 'k':
-                state.navUp();
                 manager.navUp();
                 break;
             case 'g':
