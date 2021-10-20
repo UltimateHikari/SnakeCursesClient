@@ -9,6 +9,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class MetaEngineDTO {
-    private final GameEntry defaultConfig;
+    private final GameEntry defaultEntry;
     private final Set<GameEntry> configs;
+    private final GameEntry selectedEntry;
 }

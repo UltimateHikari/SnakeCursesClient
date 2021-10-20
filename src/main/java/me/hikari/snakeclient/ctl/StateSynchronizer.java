@@ -14,6 +14,7 @@ public class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;
     private FieldState state = FieldState.LATEST;
     private NavDirection direction = NavDirection.NEUTRAL;
+    private Integer entryIndex = 0;
 
     public boolean isStateLagging() {
         return FieldState.LAGGING == state;
@@ -39,17 +40,18 @@ public class StateSynchronizer {
         }
     }
 
-    public NavDirection popNavDirection(){
+    public NavDirection popNavDirection() {
         var pop = direction;
         direction = NavDirection.NEUTRAL;
         return pop;
     }
 
-    public void NavUp(){
+    public void navUp() {
         direction = NavDirection.UP;
     }
 
-    public void NavDown(){
+    public void navDown() {
         direction = NavDirection.DOWN;
     }
+
 }

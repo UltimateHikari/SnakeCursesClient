@@ -25,34 +25,17 @@ public class MainScreen {
     private final Screen screen;
     //private final EventContainer;
     private TerminalSize size;
-    private int listCursorPosition = 0;
-    private GameEntry chosenConfig;
+    private GameEntry lastSelectedEntry = null;
 
-    private void moveListCirsor(int listSize, NavDirection direction) {
-        var curCursorPosition = listCursorPosition;
-        switch (direction) {
-            case UP:
-                listCursorPosition--;
-                break;
-            case DOWN:
-                listCursorPosition++;
-                break;
-            default:
-                break;
-        }
-        if (listCursorPosition < 0) {
-            listCursorPosition = 0;
-        }
-        if (listCursorPosition >= listSize) {
-            listCursorPosition %= listSize;
-        }
-        if(listCursorPosition != curCursorPosition){
+    private void actualizeLastSelected(GameEntry selectedDTO) {
+        if (!selectedDTO.equals(lastSelectedEntry)) {
+            lastSelectedEntry = selectedDTO;
             screen.clear();
         }
     }
 
     public void show(MetaEngineDTO dto, NavDirection navDirection) throws IOException {
-        moveListCirsor(dto.getConfigs().size() + 1, navDirection);
+        actualizeLastSelected(dto.getSelectedEntry());
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);
@@ -62,7 +45,6 @@ public class MainScreen {
     }
 
     private String getConfigName(GameEntry c) {
-        //TODO host & player name
         return c.getPlayer().getName() +
                 " " + c.getConfig().getWidth() +
                 "x" + c.getConfig().getHeight() +
@@ -70,8 +52,7 @@ public class MainScreen {
     }
 
     private void putTextWithCursor(TextGraphics tg, TerminalPosition pos, int configRowShift, GameEntry e, String prefix) {
-        if (listCursorPosition == configRowShift) {
-            chosenConfig = e;
+        if (e == lastSelectedEntry) {
             tg.putString(
                     pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT + configRowShift),
                     prefix + getConfigName(e), SGR.BLINK
@@ -92,7 +73,7 @@ public class MainScreen {
                 new TerminalSize(size.getColumns() - CONFIG_COLS, size.getRows() - HEADER_ROWS));
         tg.putString(pos, "Join Game");
         int configRowShift = 0;
-        putTextWithCursor(tg, pos, configRowShift, dto.getDefaultConfig(), NEW_GAME);
+        putTextWithCursor(tg, pos, configRowShift, dto.getDefaultEntry(), NEW_GAME);
         for (GameEntry e : dto.getConfigs()) {
             configRowShift++;
             putTextWithCursor(tg, pos, configRowShift, e, "");
@@ -107,10 +88,10 @@ public class MainScreen {
                 new TerminalSize(CONFIG_COLS, size.getRows() - HEADER_ROWS));
         tg.putString(pos, "Game config");
         TerminalPosition text = pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT);
-        putFullChosenConfig(tg, text);
+        putFullSelectedEntry(tg, text);
     }
 
-    private void putFullChosenConfig(TextGraphics tg, TerminalPosition pos) {
+    private void putFullSelectedEntry(TextGraphics tg, TerminalPosition pos) {
         tg.putString(pos.withRelative(0, 0), getName());
         tg.putString(pos.withRelative(0, 1), getIP());
         tg.putString(pos.withRelative(0, 2), getDims());
@@ -131,31 +112,32 @@ public class MainScreen {
     }
 
     private String getName() {
-        return "Name: " + chosenConfig.getPlayer().getName();
+        return "Name: " + lastSelectedEntry.getPlayer().getName();
     }
 
     private String getIP() {
-        return "Name: " + chosenConfig.getPlayer().getIp();
+        return "Name: " + lastSelectedEntry.getPlayer().getIp();
     }
 
     private String getDims() {
         return "Dims: " +
-                chosenConfig.getConfig().getWidth() + "x" +
-                chosenConfig.getConfig().getHeight();
+                lastSelectedEntry.getConfig().getWidth() + "x" +
+                lastSelectedEntry.getConfig().getHeight();
     }
 
     private String getFood() {
         return "Food: " +
-                chosenConfig.getConfig().getFoodStatic() +
-                " + " + chosenConfig.getConfig().getFoodPerPlayer() + "p";
+                lastSelectedEntry.getConfig().getFoodStatic() +
+                " + " +
+                lastSelectedEntry.getConfig().getFoodPerPlayer() + "p";
     }
 
-    private String getDelay(){
-        return "State delay: " + chosenConfig.getConfig().getStateDelayMs();
+    private String getDelay() {
+        return "State delay: " + lastSelectedEntry.getConfig().getStateDelayMs();
     }
 
-    private String getDeadProb(){
-        return "Dead prob: " + chosenConfig.getConfig().getDeadFoodProb();
+    private String getDeadProb() {
+        return "Dead prob: " + lastSelectedEntry.getConfig().getDeadFoodProb();
     }
 
 }

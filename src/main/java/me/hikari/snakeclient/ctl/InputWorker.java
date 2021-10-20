@@ -1,16 +1,18 @@
 package me.hikari.snakeclient.ctl;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.Engine;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
-@RequiredArgsConstructor
 public class InputWorker implements Runnable {
     //TODO get back to synchronizer & supplier<KeyStroke>
     private final GameManager manager;
+    private final StateSynchronizer state;
+
+    public InputWorker(GameManager manager){
+        this.manager = manager;
+        state = manager.getSynchronizer();
+    }
 
     @Override
     public void run() {
@@ -28,17 +30,26 @@ public class InputWorker implements Runnable {
     private void tryHandleStroke(KeyStroke stroke) throws IOException {
         switch (stroke.getCharacter()) {
             //TODO move magic keys to config class
+            //TODO h for help on keys?
             case 'j':
-                manager.getSynchronizer().NavDown();
+                state.navDown();
+                manager.navDown();
                 break;
             case 'k':
-                manager.getSynchronizer().NavUp();
+                state.navUp();
+                manager.navUp();
+                break;
+            case 'g':
+                if(state.isScreenMain()) {
+                    manager.startGame();
+                    state.switchActiveScreen();
+                }
                 break;
             case 'q':
                 manager.close();
                 break;
             case 'e':
-                manager.getSynchronizer().switchActiveScreen();
+                state.switchActiveScreen();
                 break;
             default:
                 System.err.println(stroke.getCharacter());

@@ -47,13 +47,14 @@ public class GameManager /*implements ManagerDTO*/{
         gameList.addGame(new Player("dummy", 1, "255.255.255.255"), new EngineConfig());
     }
 
-    public void startGame(EngineConfig config) {
-        currentEngine = new Engine(config);
+    public void startGame() {
+        var entry = gameList.getSelectedEntry();
+        currentEngine = new Engine(entry.getConfig());
 
         handlers.add(scheduler.scheduleAtFixedRate(
                 new EngineWorker(currentEngine),
                 0,
-                config.getStateDelayMs(),
+                entry.getConfig().getStateDelayMs(),
                 TimeUnit.MILLISECONDS));
     }
 
@@ -79,5 +80,13 @@ public class GameManager /*implements ManagerDTO*/{
             // TODO mb throw exception on access error?
             return null;
         }
+    }
+
+    public void navDown() {
+        gameList.navDown();
+    }
+
+    public void navUp() {
+        gameList.navUp();
     }
 }
