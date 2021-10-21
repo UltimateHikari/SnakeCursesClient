@@ -27,7 +27,7 @@ public class Tui implements PluggableUI {
     public Tui() throws IOException {
         Terminal terminal = new DefaultTerminalFactory().createTerminal();
         screen = new TerminalScreen(terminal);
-        gameScreen = new GameScreen(screen);
+        gameScreen = new GameScreen(screen, new LeftCorneredView());
         mainScreen = new MainScreen(screen);
         screen.startScreen();
     }
@@ -52,7 +52,7 @@ public class Tui implements PluggableUI {
             screen.clear();
             currentScreen = gameScreen;
         }
-        gameScreen.show();
+        gameScreen.show(engine);
     }
 
     @Override

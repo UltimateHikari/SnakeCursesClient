@@ -5,13 +5,10 @@ import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakeclient.data.config.UIConfig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Engine {
-    private Integer stateOrder;
+    private Integer stateOrder = 0;
 
     private boolean isLatest = false;
     private EngineDTO dto = null;
@@ -29,7 +26,9 @@ public class Engine {
             if (!isLatest) {
                 var map = new HashMap<Player, Snake>();
                 snakeMap.forEach((p, s) -> map.put(p, new Snake(s)));
-                dto = new EngineDTO(map, config);
+                var foodsDto = new ArrayList<>(foods);
+                dto = new EngineDTO(map, foodsDto, config);
+                isLatest = true;
             }
             return dto;
         }
@@ -43,9 +42,11 @@ public class Engine {
         private final Snake snake;
     }
 
-    public Engine(EngineConfig config) {
-        this.config = config;
+    public Engine(GameEntry entry) {
+        this.config = entry.getConfig();
         field = new FieldRepresentation(new Coord(config.getWidth(), config.getHeight()));
+        addPlayer(entry.getPlayer());
+        replenishFood();
     }
 
     public void addPlayer(Player player) {
@@ -64,6 +65,16 @@ public class Engine {
 
     public UIConfig getUIConfig() {
         return config;
+    }
+
+    public void replenishFood(){
+        //TODO update algoritm for consulting with field
+        synchronized (mapMonitor) {
+            var r = new Random();
+            while (foods.size() < config.getFoodStatic()){
+                foods.add(new Coord(r.nextInt(config.getWidth()), r.nextInt(config.getHeight())));
+            }
+        }
     }
 
     public void applyMoves() {
@@ -86,6 +97,8 @@ public class Engine {
                     m.getSnake().dropTail();
                 }
             });
+            isLatest = false;
+            stateOrder++;
         }
     }
 

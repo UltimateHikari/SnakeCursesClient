@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.hikari.snakeclient.data.config.UIConfig;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
 @AllArgsConstructor
 public class EngineDTO {
     private final Map<Player, Snake> snakeMap;
+    private final List<Coord> foods;
     private final UIConfig uiConfig;
 }

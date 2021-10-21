@@ -3,6 +3,7 @@ package me.hikari.snakeclient.data;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,10 @@ public class Snake {
     }
 
     public void showYourself(FieldRepresentation field){
+        //TODO
+    }
 
+    public List<Coord> getUnmodifiablePoints(){
+        return Collections.unmodifiableList(points);
     }
 }

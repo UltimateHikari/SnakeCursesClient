@@ -42,12 +42,13 @@ public class GameManager /*implements ManagerDTO*/{
     public GameManager(PluggableUI ui){
         this.ui = ui;
         startWorkers();
+        //TODO-0 remove test
         gameList.addGame(new Player("dummy", 1, "255.255.255.255"), new EngineConfig());
     }
 
     public void startGame() {
         var entry = gameList.getSelectedEntry();
-        currentEngine = new Engine(entry.getConfig());
+        currentEngine = new Engine(entry);
 
         handlers.add(scheduler.scheduleAtFixedRate(
                 new EngineWorker(currentEngine),

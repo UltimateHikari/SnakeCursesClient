@@ -1,0 +1,54 @@
+package me.hikari.snakeclient.tui;
+
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.BasicTextImage;
+import com.googlecode.lanterna.graphics.TextImage;
+import me.hikari.snakeclient.data.Coord;
+import me.hikari.snakeclient.data.EngineDTO;
+import me.hikari.snakeclient.data.Player;
+import me.hikari.snakeclient.data.Snake;
+
+public class LeftCorneredView implements DTO2Image {
+    private TerminalSize size;
+    private TextImage image;
+    private Brush brush;
+
+    private TerminalPosition coord2pos(Coord c) {
+        return new TerminalPosition(c.getX(), c.getY());
+    }
+
+    private void placeCharacter(TerminalPosition p, Character c, TextColor color) {
+        if (p.getColumn() < size.getColumns() && p.getRow() < size.getRows()) {
+            image.setCharacterAt(p, TextCharacter.fromCharacter(c)[0].withForegroundColor(color));
+        }
+    }
+
+    private void putSnake(Player p, Snake s) {
+        var iter = s.getUnmodifiablePoints().iterator();
+        var pos = coord2pos(iter.next());
+        //TODO-1 move char to config
+        while (iter.hasNext()) {
+            placeCharacter(pos, 'S', brush.getColor(p));
+            pos = pos.withRelative(coord2pos(iter.next()));
+        }
+        //safe to say, there is no snakes w/size = 1
+        placeCharacter(pos, 'S', brush.getColor(p));
+    }
+
+    @Override
+    public TextImage dto2image(EngineDTO dto, TerminalSize viewSize, Brush brush) {
+        size = viewSize;
+        image = new BasicTextImage(viewSize);
+        this.brush = brush;
+
+        for (Coord f : dto.getFoods()) {
+            //TODO-1 move char to config
+            placeCharacter(coord2pos(f), 'F', TextColor.ANSI.YELLOW_BRIGHT);
+        }
+        dto.getSnakeMap().forEach((p, s) -> putSnake(p, s));
+        return image;
+    }
+}
