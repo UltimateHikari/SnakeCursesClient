@@ -51,6 +51,7 @@ public class Engine {
 
     public void addPlayer(Player player) {
         Snake snake = spawnSnake();
+        snake.showYourself((c) -> field.putSnakeCell(c));
         snakeMap.put(player, snake);
     }
 
@@ -83,7 +84,7 @@ public class Engine {
 
     public void moveSnakes() {
         synchronized (mapMonitor) {
-            ArrayList<MoveResult> list = new ArrayList<>();
+            var list = new ArrayList<MoveResult>();
             snakeMap.forEach((Player p, Snake s) -> {
                 list.add(new MoveResult(s.moveHead(), s));
             });

@@ -9,6 +9,7 @@ public class EngineWorker implements Runnable {
 
     @Override
     public void run() {
+        engine.replenishFood();
         engine.applyMoves();
         engine.moveSnakes();
     }

@@ -27,15 +27,7 @@ public class LeftCorneredView implements DTO2Image {
     }
 
     private void putSnake(Player p, Snake s) {
-        var iter = s.getUnmodifiablePoints().iterator();
-        var pos = coord2pos(iter.next());
-        //TODO-1 move char to config
-        while (iter.hasNext()) {
-            placeCharacter(pos, 'S', brush.getColor(p));
-            pos = pos.withRelative(coord2pos(iter.next()));
-        }
-        //safe to say, there is no snakes w/size = 1
-        placeCharacter(pos, 'S', brush.getColor(p));
+        s.showYourself(c -> placeCharacter(coord2pos(c), 'S', brush.getColor(p)));
     }
 
     @Override

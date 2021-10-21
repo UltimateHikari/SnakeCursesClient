@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class Snake {
     }
 
     public Snake(Snake s){
+        //todo replace with list copy, error-prone
         this(s.isZombie, s.headDirection, s.points.stream().collect(Collectors.toUnmodifiableList()));
     }
 
@@ -33,11 +35,15 @@ public class Snake {
         headDirection = direction;
     }
 
-    public void showYourself(FieldRepresentation field){
-        //TODO
+    public void showYourself(Consumer<Coord> placer){
+        var iter = points.iterator();
+        var pos = iter.next();
+        while (iter.hasNext()) {
+            placer.accept(pos);
+            pos = pos.withRelative(iter.next());
+        }
+        //safe to say, there is no snakes w/size = 1
+        placer.accept(pos);
     }
 
-    public List<Coord> getUnmodifiablePoints(){
-        return Collections.unmodifiableList(points);
-    }
 }

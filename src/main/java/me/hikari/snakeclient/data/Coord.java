@@ -9,4 +9,8 @@ public class Coord {
     private int x;
     @Getter
     private int y;
+
+    public Coord withRelative(Coord c){
+        return new Coord(x + c.x, y + c.y);
+    }
 }
