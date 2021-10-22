@@ -5,8 +5,11 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
+import me.hikari.snakeclient.data.Coord;
 
 public class TuiUtils {
+    private static final Integer BORDER_DELTA = -2;
+
     public static void drawFancyBoundary(TextGraphics tg, TerminalPosition p, TerminalSize s){
         TerminalPosition upLeft = p;
         TerminalPosition downLeft = new TerminalPosition(p.getColumn(), p.getRow() + s.getRows() - 1);
@@ -32,5 +35,20 @@ public class TuiUtils {
         }else{
             return screen.getTerminalSize();
         }
+    }
+
+    public static TerminalSize tryShrinkSize(TerminalSize size, Coord world) {
+        return new TerminalSize(
+                Math.min(size.getColumns(), world.getY()),
+                Math.min(size.getRows(), world.getX())
+        );
+    }
+
+    public static TerminalSize removeBorder(TerminalSize size) {
+        return size.withRelative(BORDER_DELTA, BORDER_DELTA);
+    }
+
+    public static TerminalSize addBorder(TerminalSize size) {
+        return size.withRelative(Math.abs(BORDER_DELTA), Math.abs(BORDER_DELTA));
     }
 }
