@@ -19,7 +19,6 @@ public class Engine {
     private final Map<Player, Snake> snakeMap = new HashMap<>();
     private final Map<Player, Direction> moves = new HashMap<>();
     private final List<Coord> foods = new ArrayList<>();
-    private FieldRepresentation field;
 
     public EngineDTO getDTO() {
         synchronized (mapMonitor) {
@@ -44,20 +43,18 @@ public class Engine {
 
     public Engine(GameEntry entry) {
         this.config = entry.getConfig();
-        field = new FieldRepresentation(new Coord(config.getWidth(), config.getHeight()));
         addPlayer(entry.getPlayer());
         replenishFood();
     }
 
     public void addPlayer(Player player) {
         Snake snake = spawnSnake();
-        snake.showYourself((c) -> field.putSnakeCell(c));
         snakeMap.put(player, snake);
     }
 
     private Snake spawnSnake() {
         //TODO upgrade algo
-        return new Snake(Direction.RIGHT, new Coord(5, 5), new Coord(-1, 0));
+        return new Snake(new Coord(Direction.RIGHT), new Coord(5, 5), new Coord(Direction.LEFT));
     }
 
     public void notePlayerMove(Player player, Direction move) {
@@ -79,19 +76,20 @@ public class Engine {
     }
 
     public void applyMoves() {
-        moves.forEach((Player p, Direction d) -> snakeMap.get(p).turnHead(d));
+        moves.forEach((Player p, Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
     }
 
     public void moveSnakes() {
         synchronized (mapMonitor) {
             var list = new ArrayList<MoveResult>();
+            var field = new FieldRepresentation(new Coord(config.getWidth(), config.getHeight()));
             snakeMap.forEach((Player p, Snake s) -> {
-                list.add(new MoveResult(s.moveHead(), s));
+                list.add(new MoveResult(s.moveHead(config.worldSize()), s));
+                s.showYourself(c -> field.putSnakeCell(c), config.worldSize());
             });
-            //TODO place snakes on field
             list.forEach((MoveResult m) -> {
                 if (field.isCellSnakeCollided(m.getCoord())) {
-                    // TODO kill all stuff
+                    // TODO kill all stuff smh
                     return;
                 }
                 if (!field.isCellFoodCollided(m.getCoord())) {

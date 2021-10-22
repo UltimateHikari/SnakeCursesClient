@@ -26,21 +26,22 @@ public class LeftCorneredView implements DTO2Image {
         }
     }
 
-    private void putSnake(Player p, Snake s) {
-        s.showYourself(c -> placeCharacter(coord2pos(c), 'S', brush.getColor(p)));
+    private void putSnake(Player p, Snake s, Coord worldSize) {
+        s.showYourself(c -> placeCharacter(coord2pos(c), 'S', brush.getColor(p)), worldSize);
     }
 
     @Override
     public TextImage dto2image(EngineDTO dto, TerminalSize viewSize, Brush brush) {
         size = viewSize;
         image = new BasicTextImage(viewSize);
+        var worldSize = dto.getUiConfig().worldSize();
         this.brush = brush;
 
         for (Coord f : dto.getFoods()) {
             //TODO-1 move char to config
             placeCharacter(coord2pos(f), 'F', TextColor.ANSI.YELLOW_BRIGHT);
         }
-        dto.getSnakeMap().forEach((p, s) -> putSnake(p, s));
+        dto.getSnakeMap().forEach((p, s) -> putSnake(p, s, worldSize));
         return image;
     }
 }

@@ -8,7 +8,7 @@ public class FieldRepresentation {
         SNAKE,
         FOOD,
         SNAKE_COL,
-        FOOD_COL;
+        FOOD_COL; //means snake ate food
     };
     private final CellType[] field;
     private final Integer xDim;
@@ -28,11 +28,24 @@ public class FieldRepresentation {
     }
 
     public void putSnakeCell(Coord c){
-        setCell(c, CellType.SNAKE);
+        switch (getCell(c)){
+            case SNAKE_COL:
+                break;
+            case SNAKE, FOOD_COL:
+                setCell(c, CellType.SNAKE_COL);
+                break;
+            default:
+                setCell(c, CellType.SNAKE);
+        }
+
     }
 
     public void putFoodCell(Coord c){
         setCell(c, CellType.FOOD);
+    }
+
+    public void dropTail(Coord c){
+        setCell(c, CellType.EMPTY);
     }
 
     public boolean isCellSnakeCollided(Coord c){
