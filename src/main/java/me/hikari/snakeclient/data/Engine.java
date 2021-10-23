@@ -17,6 +17,7 @@ public class Engine {
     private final Map<Player, Snake> snakeMap = new HashMap<>();
     private final Map<Player, Direction> moves = new HashMap<>();
     private final List<Coord> foods = new ArrayList<>();
+    private final Player host;
 
     public EngineDTO getDTO() {
         synchronized (mapMonitor) {
@@ -40,7 +41,9 @@ public class Engine {
     }
 
     public Engine(GameEntry entry) {
+        //TODO refactor for join
         this.config = entry.getConfig();
+        this.host = entry.getPlayer();
         addPlayer(entry.getPlayer());
         replenishFood();
     }
@@ -55,6 +58,9 @@ public class Engine {
         return new Snake(new Coord(Direction.RIGHT), new Coord(5, 5), new Coord(Direction.LEFT));
     }
 
+    public void noteHostMove(Direction move) {
+        notePlayerMove(host, move);
+    }
     public void notePlayerMove(Player player, Direction move) {
         moves.put(player, move);
     }

@@ -1,16 +1,21 @@
 package me.hikari.snakeclient.ctl;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import me.hikari.snakeclient.data.Direction;
+import me.hikari.snakeclient.data.KeyConfig;
 
 import java.io.IOException;
+import java.security.Key;
 
 public class InputWorker implements Runnable {
     //TODO get back to synchronizer & supplier<KeyStroke>
     private final GameManager manager;
     private final StateSynchronizer state;
+    private final KeyConfig keys;
 
     public InputWorker(GameManager manager){
         this.manager = manager;
+        this.keys = manager.getKeyconfig();
         state = manager.getSynchronizer();
     }
 
@@ -28,29 +33,55 @@ public class InputWorker implements Runnable {
     }
 
     private void tryHandleStroke(KeyStroke stroke) throws IOException {
-        switch (stroke.getCharacter()) {
-            //TODO move magic keys to config class
-            //TODO h for help on keys?
-            case 'j':
-                manager.navDown();
-                break;
-            case 'k':
-                manager.navUp();
-                break;
-            case 'g':
-                if(state.isScreenMain()) {
-                    manager.startGame();
-                    state.switchActiveScreen();
-                }
-                break;
-            case 'q':
-                manager.close();
-                break;
-            case 'e':
-                state.switchActiveScreen();
-                break;
-            default:
-                System.err.println(stroke.getCharacter());
+        // switch cannot handle non-constant getters
+        // TODO config must have unique-city verification on parse
+        var c = stroke.getCharacter();
+
+        if(c == keys.getQuit()){
+            manager.close();
         }
+
+        if(c == keys.getStart()){
+            if(state.isScreenMain()) {
+                manager.startGame();
+                state.switchActiveScreen();
+            }
+        }
+
+        if(c == keys.getStop()){
+            if(!state.isScreenMain()) {
+                manager.stopGame();
+                state.switchActiveScreen();
+            }
+        }
+
+        if(c == keys.getUp()){
+            if(state.isScreenMain()){
+                manager.navUp();
+            } else {
+                manager.moveSnake(Direction.UP);
+            }
+        }
+
+        if(c == keys.getDown()){
+            if(state.isScreenMain()){
+                manager.navDown();
+            } else {
+                manager.moveSnake(Direction.DOWN);
+            }
+        }
+
+        if(c == keys.getLeft()){
+            if(!state.isScreenMain()){
+                manager.moveSnake(Direction.LEFT);
+            }
+        }
+
+        if(c == keys.getRight()){
+            if(!state.isScreenMain()){
+                manager.moveSnake(Direction.RIGHT);
+            }
+        }
+
     }
 }

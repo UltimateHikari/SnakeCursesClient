@@ -25,6 +25,8 @@ public class GameManager /*implements ManagerDTO*/{
     private final PluggableUI ui;
     @Getter
     private StateSynchronizer synchronizer = new StateSynchronizer();
+    @Getter
+    private KeyConfig keyconfig;
 
     private void startWorkers(){
         handlers.add(scheduler.scheduleAtFixedRate(
@@ -39,8 +41,9 @@ public class GameManager /*implements ManagerDTO*/{
                 TimeUnit.MILLISECONDS));
     }
 
-    public GameManager(PluggableUI ui){
+    public GameManager(PluggableUI ui, KeyConfig keyconfig){
         this.ui = ui;
+        this.keyconfig = keyconfig;
         startWorkers();
         //TODO-0 remove test
         gameList.addGame(new Player("dummy", 1, "255.255.255.255"), new EngineConfig());
@@ -87,5 +90,9 @@ public class GameManager /*implements ManagerDTO*/{
 
     public void navUp() {
         gameList.navUp();
+    }
+
+    public void moveSnake(Direction dir){
+        currentEngine.noteHostMove(dir);
     }
 }
