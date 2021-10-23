@@ -2,8 +2,6 @@ package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.hikari.snakeclient.data.config.EngineConfig;
-import me.hikari.snakeclient.data.config.UIConfig;
 
 import java.util.*;
 
@@ -23,7 +21,7 @@ public class Engine {
     public EngineDTO getDTO() {
         synchronized (mapMonitor) {
             if (!isLatest) {
-                var map = new HashMap<Player, Snake>();
+                var map = new HashMap<Player, UISnake>();
                 snakeMap.forEach((p, s) -> map.put(p, new Snake(s)));
                 var foodsDto = new ArrayList<>(foods);
                 dto = new EngineDTO(map, foodsDto, config);
@@ -61,16 +59,17 @@ public class Engine {
         moves.put(player, move);
     }
 
-    public UIConfig getUIConfig() {
-        return config;
-    }
-
-    public void replenishFood(){
-        //TODO update algoritm for consulting with field
+    public void replenishFood() {
+        //TODO update algorithm for consulting with field
         synchronized (mapMonitor) {
             var r = new Random();
-            while (foods.size() < config.getFoodStatic()){
-                foods.add(new Coord(r.nextInt(config.getWidth()), r.nextInt(config.getHeight())));
+            while (foods.size() < config.getFoodStatic()) {
+                foods.add(
+                        new Coord(
+                                r.nextInt(config.getWorldSize().getX()),
+                                r.nextInt(config.getWorldSize().getY())
+                        )
+                );
             }
         }
     }
@@ -82,10 +81,11 @@ public class Engine {
     public void moveSnakes() {
         synchronized (mapMonitor) {
             var list = new ArrayList<MoveResult>();
-            var field = new FieldRepresentation(new Coord(config.getWidth(), config.getHeight()));
+            var worldSize = config.getWorldSize();
+            var field = new FieldRepresentation(worldSize);
             snakeMap.forEach((Player p, Snake s) -> {
-                list.add(new MoveResult(s.moveHead(config.worldSize()), s));
-                s.showYourself(c -> field.putSnakeCell(c), config.worldSize());
+                list.add(new MoveResult(s.moveHead(worldSize), s));
+                s.showYourself(field::putSnakeCell, worldSize);
             });
             list.forEach((MoveResult m) -> {
                 if (field.isCellSnakeCollided(m.getCoord())) {

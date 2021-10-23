@@ -5,11 +5,9 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.Coord;
 import me.hikari.snakeclient.data.EngineDTO;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class GameScreen {
@@ -41,7 +39,7 @@ public class GameScreen {
                 size.getColumns() - INFO_COLS,
                 size.getRows() - HEADER_ROWS);
         TuiUtils.drawFancyBoundary(tg, pos, border);
-        var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getUiConfig().worldSize());
+        var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getUiConfig().getWorldSize());
         TuiUtils.drawFancyBoundary(tg, pos, TuiUtils.addBorder(viewSize));
         tg.putString(pos, "Field");
 

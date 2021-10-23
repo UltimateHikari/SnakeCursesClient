@@ -8,7 +8,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class MetaEngineDTO {
-    private final GameEntry defaultEntry;
-    private final Set<GameEntry> configs;
-    private final GameEntry selectedEntry;
+    private final UIGameEntry defaultEntry;
+    private final Set<UIGameEntry> configs;
+    private final UIGameEntry selectedEntry;
 }

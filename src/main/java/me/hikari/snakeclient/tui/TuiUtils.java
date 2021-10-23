@@ -6,6 +6,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import me.hikari.snakeclient.data.Coord;
+import me.hikari.snakeclient.data.UIGameEntry;
 
 public class TuiUtils {
     private static final Integer BORDER_DELTA = -2;
@@ -39,8 +40,8 @@ public class TuiUtils {
 
     public static TerminalSize tryShrinkSize(TerminalSize size, Coord world) {
         return new TerminalSize(
-                Math.min(size.getColumns(), world.getY()),
-                Math.min(size.getRows(), world.getX())
+                Math.min(size.getColumns(), world.getX()),
+                Math.min(size.getRows(), world.getY())
         );
     }
 
@@ -50,5 +51,10 @@ public class TuiUtils {
 
     public static TerminalSize addBorder(TerminalSize size) {
         return size.withRelative(Math.abs(BORDER_DELTA), Math.abs(BORDER_DELTA));
+    }
+
+    public static String entryDims(UIGameEntry e){
+        return  e.getConfig().getWorldSize().getX() +
+                "x" + e.getConfig().getWorldSize().getY();
     }
 }

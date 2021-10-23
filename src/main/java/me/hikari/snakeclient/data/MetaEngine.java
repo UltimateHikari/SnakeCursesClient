@@ -1,7 +1,5 @@
 package me.hikari.snakeclient.data;
 
-import me.hikari.snakeclient.data.config.EngineConfig;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,7 +19,7 @@ public class MetaEngine {
     private int selectedIndex = 0;
 
     public MetaEngineDTO getDTO() {
-        Set<GameEntry> config;
+        Set<UIGameEntry> config;
         synchronized (mapMonitor) {
             if (!isLatest) {
                 config = new HashSet<>(games.keySet());

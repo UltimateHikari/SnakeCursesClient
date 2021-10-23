@@ -5,10 +5,10 @@ enum ActiveScreen {
     GAME;
 }
 
-enum FieldState {
-    LATEST,
-    LAGGING;
-}
+//enum FieldState {
+//    LATEST,
+//    LAGGING;
+//}
 
 public class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;

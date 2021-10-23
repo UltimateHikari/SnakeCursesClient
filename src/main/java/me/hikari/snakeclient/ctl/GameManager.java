@@ -2,7 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 import lombok.Getter;
 import me.hikari.snakeclient.data.*;
-import me.hikari.snakeclient.data.config.EngineConfig;
+import me.hikari.snakeclient.data.EngineConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
 
 import java.io.IOException;

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
-public class Snake {
+public class Snake implements UISnake{
     //TODO implement unguided snake interface with only show yourself for ui
     // TODO mb some monitor protection? first place for searching for error
     private boolean isZombie;
@@ -29,8 +29,8 @@ public class Snake {
         return newHead;
     }
 
-    public Coord dropTail() {
-        return points.remove(points.size() - 1);
+    public void dropTail() {
+        points.remove(points.size() - 1);
     }
 
     public void turnHead(Coord direction) {

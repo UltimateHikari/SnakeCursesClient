@@ -20,11 +20,11 @@ public class FieldRepresentation {
     }
 
     private CellType getCell(Coord c){
-        return field[xDim*c.getX() + c.getY()];
+        return field[xDim*c.getY() + c.getX()];
     }
 
     private void setCell(Coord c, CellType type){
-        field[xDim*c.getX() + c.getY()] = type;
+        field[xDim*c.getY() + c.getX()] = type;
     }
 
     public void putSnakeCell(Coord c){

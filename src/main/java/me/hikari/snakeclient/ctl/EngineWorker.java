@@ -11,6 +11,12 @@ public class EngineWorker implements Runnable {
     public void run() {
         engine.replenishFood();
         engine.applyMoves();
-        engine.moveSnakes();
+        try {
+            engine.moveSnakes();
+        }catch (Exception e){
+            //TODO add graceful exit, now its for swift tests
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 }

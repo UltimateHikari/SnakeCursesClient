@@ -9,7 +9,7 @@ import com.googlecode.lanterna.graphics.TextImage;
 import me.hikari.snakeclient.data.Coord;
 import me.hikari.snakeclient.data.EngineDTO;
 import me.hikari.snakeclient.data.Player;
-import me.hikari.snakeclient.data.Snake;
+import me.hikari.snakeclient.data.UISnake;
 
 public class LeftCorneredView implements DTO2Image {
     private TerminalSize size;
@@ -26,7 +26,7 @@ public class LeftCorneredView implements DTO2Image {
         }
     }
 
-    private void putSnake(Player p, Snake s, Coord worldSize) {
+    private void putSnake(Player p, UISnake s, Coord worldSize) {
         s.showYourself(c -> placeCharacter(coord2pos(c), 'S', brush.getColor(p)), worldSize);
     }
 
@@ -34,7 +34,7 @@ public class LeftCorneredView implements DTO2Image {
     public TextImage dto2image(EngineDTO dto, TerminalSize viewSize, Brush brush) {
         size = viewSize;
         image = new BasicTextImage(viewSize);
-        var worldSize = dto.getUiConfig().worldSize();
+        var worldSize = dto.getUiConfig().getWorldSize();
         this.brush = brush;
 
         for (Coord f : dto.getFoods()) {

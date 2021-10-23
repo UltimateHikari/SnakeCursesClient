@@ -6,8 +6,8 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.GameEntry;
 import me.hikari.snakeclient.data.MetaEngineDTO;
+import me.hikari.snakeclient.data.UIGameEntry;
 
 import java.io.IOException;
 
@@ -23,9 +23,9 @@ public class MainScreen {
     private final Screen screen;
     //private final EventContainer;
     private TerminalSize size;
-    private GameEntry lastSelectedEntry = null;
+    private UIGameEntry lastSelectedEntry = null;
 
-    private void actualizeLastSelected(GameEntry selectedDTO) {
+    private void actualizeLastSelected(UIGameEntry selectedDTO) {
         if (!selectedDTO.equals(lastSelectedEntry)) {
             lastSelectedEntry = selectedDTO;
             screen.clear();
@@ -42,14 +42,13 @@ public class MainScreen {
         screen.refresh();
     }
 
-    private String getConfigName(GameEntry c) {
+    private String getConfigName(UIGameEntry c) {
         return c.getPlayer().getName() +
-                " " + c.getConfig().getWidth() +
-                "x" + c.getConfig().getHeight() +
+                " " + TuiUtils.entryDims(c) +
                 ": " + c.getConfig().getFoodStatic();
     }
 
-    private void putTextWithCursor(TextGraphics tg, TerminalPosition pos, int configRowShift, GameEntry e, String prefix) {
+    private void putTextWithCursor(TextGraphics tg, TerminalPosition pos, int configRowShift, UIGameEntry e, String prefix) {
         if (e == lastSelectedEntry) {
             tg.putString(
                     pos.withRelative(CONFIG_ENTRY_COL_SHIFT, CONFIG_ENTRY_ROW_SHIFT + configRowShift),
@@ -72,7 +71,7 @@ public class MainScreen {
         tg.putString(pos, "Join Game");
         int configRowShift = 0;
         putTextWithCursor(tg, pos, configRowShift, dto.getDefaultEntry(), NEW_GAME);
-        for (GameEntry e : dto.getConfigs()) {
+        for (UIGameEntry e : dto.getConfigs()) {
             configRowShift++;
             putTextWithCursor(tg, pos, configRowShift, e, "");
         }
@@ -118,9 +117,7 @@ public class MainScreen {
     }
 
     private String getDims() {
-        return "Dims: " +
-                lastSelectedEntry.getConfig().getWidth() + "x" +
-                lastSelectedEntry.getConfig().getHeight();
+        return "Dims: " + TuiUtils.entryDims(lastSelectedEntry);
     }
 
     private String getFood() {

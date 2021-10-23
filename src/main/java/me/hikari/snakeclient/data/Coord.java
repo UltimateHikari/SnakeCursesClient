@@ -35,14 +35,16 @@ public class Coord {
         }
     }
 
-    public Coord withRelative(Coord c) {
-        return new Coord(x + c.x, y + c.y);
-    }
     public Coord withRelative(Coord c, Coord world) {
         return new Coord((x + c.x + world.x) % world.x, (y + c.y + world.y) % world.y);
     }
 
     public Coord withReverse(){
         return new Coord(x*-1, y*-1);
+    }
+
+    @Override
+    public String toString(){
+        return "(" + x + ", " + y + ")";
     }
 }
