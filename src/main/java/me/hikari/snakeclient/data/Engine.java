@@ -80,15 +80,24 @@ public class Engine {
         }
     }
 
+    public void removeFood(Coord f){
+        for(int i = 0; i < foods.size(); i++){
+            if(f.equals(foods.get(i))){
+                foods.remove(i);
+            }
+        }
+    }
+
     public void applyMoves() {
         moves.forEach((Player p, Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
+        moves.clear();
     }
 
     public void moveSnakes() {
         synchronized (mapMonitor) {
             var list = new ArrayList<MoveResult>();
             var worldSize = config.getWorldSize();
-            var field = new FieldRepresentation(worldSize);
+            var field = new FieldRepresentation(worldSize, foods);
             snakeMap.forEach((Player p, Snake s) -> {
                 list.add(new MoveResult(s.moveHead(worldSize), s));
                 s.showYourself(field::putSnakeCell, worldSize);
@@ -100,8 +109,11 @@ public class Engine {
                 }
                 if (!field.isCellFoodCollided(m.getCoord())) {
                     m.getSnake().dropTail();
+                } else {
+                  removeFood(m.getCoord());
                 }
             });
+            replenishFood();
             isLatest = false;
             stateOrder++;
         }

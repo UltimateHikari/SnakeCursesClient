@@ -1,6 +1,7 @@
 package me.hikari.snakeclient.data;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class FieldRepresentation {
     private enum CellType{
@@ -13,10 +14,13 @@ public class FieldRepresentation {
     private final CellType[] field;
     private final Integer xDim;
 
-    FieldRepresentation(Coord dims){
+    FieldRepresentation(Coord dims, List<Coord> foods){
         xDim = dims.getX();
         field = new CellType[dims.getX()*dims.getY()];
         Arrays.fill(field, CellType.EMPTY);
+        for(Coord c: foods){
+            setCell(c, CellType.FOOD);
+        }
     }
 
     private CellType getCell(Coord c){
@@ -30,6 +34,9 @@ public class FieldRepresentation {
     public void putSnakeCell(Coord c){
         switch (getCell(c)){
             case SNAKE_COL:
+                break;
+            case FOOD:
+                setCell(c, CellType.FOOD_COL);
                 break;
             case SNAKE, FOOD_COL:
                 setCell(c, CellType.SNAKE_COL);

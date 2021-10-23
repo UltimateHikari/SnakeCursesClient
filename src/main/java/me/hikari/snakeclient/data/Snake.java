@@ -34,7 +34,7 @@ public class Snake implements UISnake{
     }
 
     public void turnHead(Coord direction) {
-        if (!(direction == points.get(1))) {
+        if (!direction.withReverse().equals(headDirection)) {
             //preventing neck-eating
             headDirection = direction;
         }
