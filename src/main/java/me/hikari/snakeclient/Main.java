@@ -8,7 +8,10 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        //TODO add passing default config file as arg
+        /**
+         * TODO add passing default config file as arg
+         * TODO config must have unique-city verification on parse
+         */
         Tui tui = new Tui();
         KeyConfig keyConfig = new KeyConfig();
         GameManager manager = new GameManager(tui, keyConfig);

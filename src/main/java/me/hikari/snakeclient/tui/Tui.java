@@ -10,13 +10,6 @@ import me.hikari.snakeclient.data.MetaEngineDTO;
 
 import java.io.IOException;
 
-/**
- * screens:
- * new game //TODO
- * enter existing //TODO
- * gamescreen
- */
-
 public class Tui implements PluggableUI {
     private Screen screen;
 

@@ -14,7 +14,6 @@ enum SnakeState{
 
 @AllArgsConstructor
 public class Snake implements UISnake{
-    // TODO mb some monitor protection? first place for searching for error
     private SnakeState state;
     private Coord headDirection;
     private LinkedList<Coord> points; // same logic as in protobuf for compat

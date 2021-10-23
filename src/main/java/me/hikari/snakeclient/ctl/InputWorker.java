@@ -34,7 +34,6 @@ public class InputWorker implements Runnable {
 
     private void tryHandleStroke(KeyStroke stroke) throws IOException {
         // switch cannot handle non-constant getters
-        // TODO config must have unique-city verification on parse
         var c = stroke.getCharacter();
 
         if(c == keys.getQuit()){
