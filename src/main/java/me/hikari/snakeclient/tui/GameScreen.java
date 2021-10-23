@@ -72,8 +72,10 @@ public class GameScreen {
                     .sorted(Comparator.comparing(Player::getScore))
                     .toArray(size -> new Player[size]);
             for (int i = 0; i < sPlayers.length; i++) {
+                tg.setForegroundColor(brush.getColor(sPlayers[i]));
                 tg.putString(TuiUtils.shift(pos, i), playerScore(sPlayers[i]));
             }
+            tg.clearModifiers();
         }catch(Exception e){
             e.printStackTrace();
             System.exit(-1);
