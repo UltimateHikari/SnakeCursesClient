@@ -14,6 +14,6 @@ public class EngineConfig implements UIConfig {
     private final Integer pingDelayMs;
     private final Integer nodeTimeoutMs;
     public EngineConfig(){
-        this(new Coord(40, 30),1,1.f,200,.1f,100,800);
+        this(new Coord(40, 30),1,1.f,100,.1f,100,800);
     }
 }

@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.DoubleStream;
 
 public class Engine {
     private Integer stateOrder = 0;
+    private final static Integer PRECISION = 10000;
 
     private boolean isLatest = false;
     private EngineDTO dto = null;
@@ -99,12 +102,15 @@ public class Engine {
             var worldSize = config.getWorldSize();
             var field = new FieldRepresentation(worldSize, foods);
             snakeMap.forEach((Player p, Snake s) -> {
-                list.add(new MoveResult(s.moveHead(worldSize), s));
-                s.showYourself(field::putSnakeCell, worldSize);
+                if(!s.isDead()) {
+                    list.add(new MoveResult(s.moveHead(worldSize), s));
+                    s.showYourself(field::putSnakeCell, worldSize);
+                }
             });
             list.forEach((MoveResult m) -> {
                 if (field.isCellSnakeCollided(m.getCoord())) {
-                    // TODO kill all stuff smh
+                    m.getSnake().showYourself(this::spawnFoodWithProb, worldSize);
+                    m.getSnake().die();
                     return;
                 }
                 if (!field.isCellFoodCollided(m.getCoord())) {
@@ -116,6 +122,13 @@ public class Engine {
             replenishFood();
             isLatest = false;
             stateOrder++;
+        }
+    }
+
+    private void spawnFoodWithProb(Coord coord) {
+        Random random = ThreadLocalRandom.current();
+        if(config.getDeadFoodProb() > (float)random.nextInt(PRECISION)/PRECISION){
+            foods.add(coord);
         }
     }
 

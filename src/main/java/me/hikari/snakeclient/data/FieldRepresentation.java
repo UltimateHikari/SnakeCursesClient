@@ -47,14 +47,6 @@ public class FieldRepresentation {
 
     }
 
-    public void putFoodCell(Coord c){
-        setCell(c, CellType.FOOD);
-    }
-
-    public void dropTail(Coord c){
-        setCell(c, CellType.EMPTY);
-    }
-
     public boolean isCellSnakeCollided(Coord c){
         return getCell(c) == CellType.SNAKE_COL;
     }
