@@ -40,6 +40,8 @@ public class Engine {
         @Getter
         private final Coord coord;
         @Getter
+        private final Player player;
+        @Getter
         private final Snake snake;
     }
 
@@ -103,11 +105,12 @@ public class Engine {
             var field = new FieldRepresentation(worldSize, foods);
             snakeMap.forEach((Player p, Snake s) -> {
                 if(!s.isDead()) {
-                    list.add(new MoveResult(s.moveHead(worldSize), s));
+                    list.add(new MoveResult(s.moveHead(worldSize), p, s));
                     s.showYourself(field::putSnakeCell, worldSize);
                 }
             });
             list.forEach((MoveResult m) -> {
+                // TODO modify accordingly with .txt
                 if (field.isCellSnakeCollided(m.getCoord())) {
                     m.getSnake().showYourself(this::spawnFoodWithProb, worldSize);
                     m.getSnake().die();
@@ -116,7 +119,8 @@ public class Engine {
                 if (!field.isCellFoodCollided(m.getCoord())) {
                     m.getSnake().dropTail();
                 } else {
-                  removeFood(m.getCoord());
+                    m.getPlayer().score();
+                    removeFood(m.getCoord());
                 }
             });
             replenishFood();

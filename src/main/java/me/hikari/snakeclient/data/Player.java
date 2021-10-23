@@ -14,4 +14,7 @@ public class Player {
     public Player(){
         this("host", 0, "localhost");
     }
+    public void score(){
+        score += 1;
+    }
 }

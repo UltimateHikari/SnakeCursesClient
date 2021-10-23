@@ -6,10 +6,13 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import me.hikari.snakeclient.data.Coord;
+import me.hikari.snakeclient.data.GameEntry;
+import me.hikari.snakeclient.data.UIConfig;
 import me.hikari.snakeclient.data.UIGameEntry;
 
 public class TuiUtils {
     private static final Integer BORDER_DELTA = -2;
+    private static final Integer ENTRY_SHIFT = 1;
 
     public static void drawFancyBoundary(TextGraphics tg, TerminalPosition p, TerminalSize s){
         TerminalPosition upLeft = p;
@@ -53,8 +56,55 @@ public class TuiUtils {
         return size.withRelative(Math.abs(BORDER_DELTA), Math.abs(BORDER_DELTA));
     }
 
+    public static TerminalPosition shift(TerminalPosition pos, Integer row){
+        return pos.withRelative(ENTRY_SHIFT, ENTRY_SHIFT + row);
+    }
+
     public static String entryDims(UIGameEntry e){
-        return  e.getConfig().getWorldSize().getX() +
-                "x" + e.getConfig().getWorldSize().getY();
+        return  entryDims(e.getConfig());
+    }
+    private static String entryDims(UIConfig e){
+        return  e.getWorldSize().getX() +
+                "x" + e.getWorldSize().getY();
+    }
+
+    public static void putFullGameEntry(TextGraphics tg, TerminalPosition pos, UIGameEntry e) {
+        tg.putString(pos.withRelative(0, 0), getName(e));
+        tg.putString(pos.withRelative(0, 1), getIP(e));
+        putFullConfig(tg, pos.withRelative(0,2), e.getConfig());
+    }
+
+    private static String getName(UIGameEntry e) {
+        return "Name: " + e.getPlayer().getName();
+    }
+
+    private static String getIP(UIGameEntry e) {
+        return "IP: " + e.getPlayer().getIp();
+    }
+
+    private static String getDims(UIConfig e) {
+        return "Dims: " + entryDims(e);
+    }
+
+    private static String getFood(UIConfig e) {
+        return "Food: " +
+                e.getFoodStatic() +
+                " + " +
+                e.getFoodPerPlayer() + "p";
+    }
+
+    private static String getDelay(UIConfig e) {
+        return "State delay: " + e.getStateDelayMs();
+    }
+
+    private static String getDeadProb(UIConfig e) {
+        return "Dead prob: " + e.getDeadFoodProb();
+    }
+
+    public static void putFullConfig(TextGraphics tg, TerminalPosition pos, UIConfig e) {
+        tg.putString(pos.withRelative(0, 0), getDims(e));
+        tg.putString(pos.withRelative(0, 1), getFood(e));
+        tg.putString(pos.withRelative(0, 2), getDelay(e));
+        tg.putString(pos.withRelative(0, 3), getDeadProb(e));
     }
 }
