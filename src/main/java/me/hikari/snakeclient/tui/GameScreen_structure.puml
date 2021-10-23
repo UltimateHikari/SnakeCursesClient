@@ -1,0 +1,260 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": ""
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false // root node is included
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "me.hikari.snakeclient.tui.GameScreen"
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1217281394 { 
+   	label=hikari
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_280437163 { 
+   	label=snakeclient
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   Brush1042894757[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Brush</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   colors: Map&lt;Player, TextColor&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   unused: List&lt;TextColor&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ getColor(p: Player): TextColor</TD></TR>
+<TR><TD ALIGN="LEFT" >- initUnused()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+GameManager1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)GameManager</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   currentEngine: Engine [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   currentGame: ScheduledFuture&lt;?&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   gameList: MetaEngine [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   handlers: List&lt;ScheduledFuture&lt;?&gt;&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   scheduler: ScheduledExecutorService [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   synchronizer: StateSynchronizer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ui: PluggableUI [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ close()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ navDown()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ navUp()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ startGame()</TD></TR>
+<TR><TD ALIGN="LEFT" >- startWorkers()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ stopGame()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+GameScreen1042894757[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)GameScreen</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   brush: Brush [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   converter: DTO2Image [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   screen: Screen [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   size: TerminalSize [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- drawField(tg: TextGraphics, dto: EngineDTO)</TD></TR>
+<TR><TD ALIGN="LEFT" >- drawHeader(tg: TextGraphics)</TD></TR>
+<TR><TD ALIGN="LEFT" >- drawInfo(tg: TextGraphics)</TD></TR>
+<TR><TD ALIGN="LEFT" >- drawScores(tg: TextGraphics)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ show(dto: EngineDTO)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+InputWorker1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)InputWorker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   manager: GameManager [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   state: StateSynchronizer [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ run()</TD></TR>
+<TR><TD ALIGN="LEFT" >- tryHandleStroke(stroke: KeyStroke)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+LeftCorneredView1042894757[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)LeftCorneredView</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   brush: Brush [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   image: TextImage [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   size: TerminalSize [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- coord2pos(c: Coord): TerminalPosition</TD></TR>
+<TR><TD ALIGN="LEFT" >+ dto2image(dto: EngineDTO, viewSize: TerminalSize, brush: Brush): TextImage</TD></TR>
+<TR><TD ALIGN="LEFT" >- placeCharacter(p: TerminalPosition, c: Character, color: TextColor)</TD></TR>
+<TR><TD ALIGN="LEFT" >- putSnake(p: Player, s: Snake, worldSize: Coord)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Player2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Player</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   id: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ip: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   name: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   score: Integer [0..1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Tui1042894757[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Tui</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   currentScreen: Object [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   gameScreen: GameScreen [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mainScreen: MainScreen [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   screen: Screen [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ close()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ showGameScreen(engine: EngineDTO)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ showMainScreen(engine: MetaEngineDTO)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UIWorker1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UIWorker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   manager: GameManager [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ run()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+Brush1042894757 -> Player2029505463[label="colors
+[0..*]"];
+GameManager1042911122 -> Tui1042894757[label="ui
+[0..1]"];
+GameScreen1042894757 -> Brush1042894757[label="brush
+[0..1]"];
+GameScreen1042894757 -> LeftCorneredView1042894757[arrowhead=none, arrowtail=empty, dir=both];
+InputWorker1042911122 -> GameManager1042911122[label="manager
+[0..1]"];
+LeftCorneredView1042894757 -> Brush1042894757[label="brush
+[0..1]"];
+Tui1042894757 -> GameScreen1042894757[label="gameScreen
+[0..1]"];
+UIWorker1042911122 -> GameManager1042911122[label="manager
+[0..1]"];
+    
+}
+@enduml

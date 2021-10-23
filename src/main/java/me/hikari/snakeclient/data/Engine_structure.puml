@@ -1,0 +1,309 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": ""
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 6,
+    "backwardDepth": 6,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false // root node is included
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "me.hikari.snakeclient.data.Engine"
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1217281394 { 
+   	label=hikari
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_280437163 { 
+   	label=snakeclient
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   Coord2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Coord</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   x: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   y: int [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ withReverse(): Coord</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Engine2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Engine</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   config: EngineConfig [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   dto: EngineDTO [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   foods: List&lt;Coord&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   isLatest: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapMonitor: Object [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   moves: Map&lt;Player, Direction&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   snakeMap: Map&lt;Player, Snake&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stateOrder: Integer [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addPlayer(player: Player)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ applyMoves()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ moveSnakes()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ notePlayerMove(player: Player, move: Direction)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ replenishFood()</TD></TR>
+<TR><TD ALIGN="LEFT" >- spawnSnake(): Snake</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EngineConfig732753575[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EngineConfig</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   deadFoodProb: Float [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   foodPerPlayer: Float [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   foodStatic: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   height: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   nodeTimeoutMs: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   pingDelayMs: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stateDelayMs: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   width: Integer [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ worldSize(): Coord</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EngineDTO2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EngineDTO</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   foods: List&lt;Coord&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   snakeMap: Map&lt;Player, Snake&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   uiConfig: UIConfig [0..1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EngineWorker1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EngineWorker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   engine: Engine [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ run()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+GameManager1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)GameManager</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   currentEngine: Engine [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   currentGame: ScheduledFuture&lt;?&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   gameList: MetaEngine [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   handlers: List&lt;ScheduledFuture&lt;?&gt;&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   scheduler: ScheduledExecutorService [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   synchronizer: StateSynchronizer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ui: PluggableUI [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ close()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ navDown()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ navUp()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ startGame()</TD></TR>
+<TR><TD ALIGN="LEFT" >- startWorkers()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ stopGame()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+InputWorker1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)InputWorker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   manager: GameManager [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   state: StateSynchronizer [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ run()</TD></TR>
+<TR><TD ALIGN="LEFT" >- tryHandleStroke(stroke: KeyStroke)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Player2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Player</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   id: Integer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ip: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   name: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   score: Integer [0..1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Snake2029505463[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Snake</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   headDirection: Coord [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   isZombie: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   points: LinkedList&lt;Coord&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ dropTail(): Coord</TD></TR>
+<TR><TD ALIGN="LEFT" >+ moveHead(world: Coord): Coord</TD></TR>
+<TR><TD ALIGN="LEFT" >+ showYourself(placer: Consumer&lt;Coord&gt;, world: Coord)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ turnHead(direction: Coord)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+UIWorker1042911122[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)UIWorker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   manager: GameManager [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ run()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+Engine2029505463 -> Coord2029505463[label="foods
+[0..*]"];
+Engine2029505463 -> EngineConfig732753575[label="config
+[0..1]"];
+Engine2029505463 -> EngineDTO2029505463[label="dto
+[0..1]"];
+Engine2029505463 -> Player2029505463[label="moves
+[0..*]"];
+Engine2029505463 -> Player2029505463[label="snakeMap
+[0..*]"];
+Engine2029505463 -> Snake2029505463[label="snakeMap
+[0..*]"];
+EngineDTO2029505463 -> Coord2029505463[label="foods
+[0..*]"];
+EngineDTO2029505463 -> Player2029505463[label="snakeMap
+[0..*]"];
+EngineDTO2029505463 -> Snake2029505463[label="snakeMap
+[0..*]"];
+EngineWorker1042911122 -> Engine2029505463[label="engine
+[0..1]"];
+GameManager1042911122 -> Engine2029505463[label="currentEngine
+[0..1]"];
+InputWorker1042911122 -> GameManager1042911122[label="manager
+[0..1]"];
+Snake2029505463 -> Coord2029505463[label="headDirection
+[0..1]"];
+Snake2029505463 -> Coord2029505463[label="points
+[0..*]"];
+UIWorker1042911122 -> GameManager1042911122[label="manager
+[0..1]"];
+    
+}
+@enduml
