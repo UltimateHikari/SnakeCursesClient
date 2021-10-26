@@ -1,9 +1,7 @@
 package me.hikari.snakeclient.data.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
@@ -27,7 +25,16 @@ public class KeyConfig {
              @JsonProperty("up") char up,
              @JsonProperty("down") char down,
              @JsonProperty("left") char left,
-             @JsonProperty("right") char right) {
+             @JsonProperty("right") char right
+    ) {
+        this.quit = quit;
+        this.start = start;
+        this.stop = stop;
+        this.ret = ret;
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
     }
 
     @Override
