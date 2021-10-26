@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class UIWorker implements Runnable {
+class UIWorker implements Runnable {
     private final GameManager manager;
 
     @Override

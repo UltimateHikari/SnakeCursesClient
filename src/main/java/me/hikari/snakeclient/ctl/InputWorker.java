@@ -7,7 +7,7 @@ import me.hikari.snakeclient.data.KeyConfig;
 import java.io.IOException;
 import java.security.Key;
 
-public class InputWorker implements Runnable {
+class InputWorker implements Runnable {
     //TODO get back to synchronizer & supplier<KeyStroke>
     private final GameManager manager;
     private final StateSynchronizer state;
