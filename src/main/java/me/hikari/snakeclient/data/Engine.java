@@ -2,10 +2,10 @@ package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.hikari.snakeclient.data.config.EngineConfig;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.DoubleStream;
 
 public class Engine {
     private Integer stateOrder = 0;

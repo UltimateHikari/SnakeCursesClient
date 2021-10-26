@@ -2,7 +2,9 @@ package me.hikari.snakeclient.ctl;
 
 import lombok.Getter;
 import me.hikari.snakeclient.data.*;
-import me.hikari.snakeclient.data.EngineConfig;
+import me.hikari.snakeclient.data.config.EngineConfig;
+import me.hikari.snakeclient.data.config.GameConfig;
+import me.hikari.snakeclient.data.config.KeyConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
 import me.hikari.snakes.SnakesProto;
 
@@ -17,25 +19,21 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class GameManager{
+public class GameManager {
     private static final int UI_REFRESH_RATE_MS = 10;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
     private ScheduledFuture<?> currentGame = null;
     private List<ScheduledFuture<?>> handlers = new ArrayList<>();
 
+    private final GameConfig config;
     private Engine currentEngine = null;
-    private MetaEngine gameList = new MetaEngine();
+    private MetaEngine gameList;
     @Getter
     private final PluggableUI ui;
     @Getter
     private StateSynchronizer synchronizer = new StateSynchronizer();
-    @Getter
-    private KeyConfig keyconfig;
 
-    private final InetSocketAddress group;
-    private final Integer selfPort;
-
-    private void startWorkers(){
+    private void startWorkers() {
         handlers.add(scheduler.scheduleAtFixedRate(
                 new UIWorker(this),
                 0,
@@ -48,22 +46,20 @@ public class GameManager{
                 TimeUnit.MILLISECONDS));
     }
 
-    public GameManager(PluggableUI ui, KeyConfig keyconfig, String addr, Integer port, Integer selfPort) throws UnknownHostException {
+    public GameManager(PluggableUI ui, GameConfig config) {
         // TODO encase network stuff into NetConfig or sth
         this.ui = ui;
-        this.keyconfig = keyconfig;
-        this.group = new InetSocketAddress(InetAddress.getByName(addr), port);
-        this.selfPort = selfPort;
+        this.config = config;
+        this.gameList = new MetaEngine(new GameEntry(new Player(config.getPlayerConfig()), config.getEngineConfig()));
         startWorkers();
-        //TODO-0 remove test
-        gameList.addGame(new Player("dummy", 1, "255.255.255.255"), new EngineConfig());
     }
 
-    public void start(){
+    public void start() {
         /**
          * TODO main loop of sending/recving messages
          */
     }
+
     public void close() throws IOException {
         handlers.forEach(h -> h.cancel(true));
         scheduler.shutdown();
@@ -86,14 +82,14 @@ public class GameManager{
         currentEngine = null;
     }
 
-    MetaEngineDTO getMetaDTO(){
+    MetaEngineDTO getMetaDTO() {
         return gameList.getDTO();
     }
 
-    EngineDTO getEngineDTO(){
-        if(currentEngine != null){
+    EngineDTO getEngineDTO() {
+        if (currentEngine != null) {
             return currentEngine.getDTO();
-        }else{
+        } else {
             // TODO mb throw exception on access error?
             return null;
         }
@@ -107,12 +103,16 @@ public class GameManager{
         gameList.navUp();
     }
 
-    void moveSnake(Direction dir){
+    void moveSnake(Direction dir) {
         currentEngine.noteHostMove(dir);
     }
 
-    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg){
+    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg) {
         // TODO do stuff and then
         //gameList.addGame(player, config);
+    }
+
+    public KeyConfig getKeyconfig() {
+        return config.getKeyConfig();
     }
 }

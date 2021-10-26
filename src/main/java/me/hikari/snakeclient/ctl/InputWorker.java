@@ -2,10 +2,9 @@ package me.hikari.snakeclient.ctl;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import me.hikari.snakeclient.data.Direction;
-import me.hikari.snakeclient.data.KeyConfig;
+import me.hikari.snakeclient.data.config.KeyConfig;
 
 import java.io.IOException;
-import java.security.Key;
 
 class InputWorker implements Runnable {
     //TODO get back to synchronizer & supplier<KeyStroke>

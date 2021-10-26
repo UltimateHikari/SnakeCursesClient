@@ -1,11 +1,10 @@
 package me.hikari.snakeclient.data;
 
+import lombok.RequiredArgsConstructor;
+import me.hikari.snakeclient.data.config.EngineConfig;
+
 import java.util.*;
 import java.util.stream.Collectors;
-
-/**
- * default entry configured with text config
- */
 
 public class MetaEngine {
     private final static Integer GAME_KEEP_ALIVE_MS = 5000;
@@ -14,9 +13,14 @@ public class MetaEngine {
 
     private boolean isLatest = false;
     private MetaEngineDTO dto;
-    private GameEntry defaultEntry = new GameEntry(new Player(), new EngineConfig());
-    private GameEntry selectedEntry = defaultEntry;
+    private final GameEntry defaultEntry;
+    private GameEntry selectedEntry = null;
     private int selectedIndex = 0;
+
+    public MetaEngine(GameEntry entry){
+        this.defaultEntry = entry;
+        refreshSelectedEntry();
+    }
 
     public MetaEngineDTO getDTO() {
         Set<UIGameEntry> config;

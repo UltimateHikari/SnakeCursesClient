@@ -1,0 +1,26 @@
+playerconfig:
+  name: "host"
+  port: 6062
+netconfig:
+  groupip: "239.192.0.4"
+  groupport: 9192
+  groupiface: "wlp3s0"
+  listenport: 6061
+gameconfig:
+  width: 40
+  height: 20
+  food_static: 1
+  food_per_player: 0.1
+  state_delay_ms: 200
+  dead_food_prob: 0.5
+  ping_delay_ms: 100
+  node_timeout_ms: 800
+keyconfig:
+  quit:  'q'
+  start: 'g'
+  stop:  'h'
+  ret:   'e'
+  up:    'w'
+  down:  's'
+  left:  'a'
+  right: 'd'
