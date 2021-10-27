@@ -2,11 +2,11 @@ player:
   name: "host"
   port: 6062
 net:
-  max_msg_size: 1000
-  group_ip: "239.192.0.4"
-  group_port: 9192
-  group_iface: "wlp3s0"
-  listen_port: 6061
+  maxMsgSize: 1000
+  groupIP: "239.192.0.4"
+  groupPort: 9192
+  groupIf: "wlp3s0"
+  listenPort: 6061
 engine:
   width: 40
   height: 20

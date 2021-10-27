@@ -1,34 +1,28 @@
 package me.hikari.snakeclient.data.config;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.net.*;
 
 @Getter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class NetConfig {
-    private final Integer maxMessageSize;
-    private final InetSocketAddress groupAddr;
-    private final NetworkInterface netIf;
-    private final Integer listenPort;
+    private Integer maxMsgSize;
+    private String groupIP;
+    private Integer groupPort;
+    private String groupIf;
+    private Integer listenPort;
 
-    @JsonCreator
-    public NetConfig(
-            @JsonProperty("max_msg_size") Integer maxMessageSize,
-            @JsonProperty("group_ip") String groupIP,
-            @JsonProperty("group_port") Integer groupPort,
-            @JsonProperty("group_iface") String groupIf,
-            @JsonProperty("listen_port") Integer listenPort
-    ) throws UnknownHostException, SocketException {
-        this.maxMessageSize = maxMessageSize;
-        this.groupAddr = new InetSocketAddress(InetAddress.getByName(groupIP), groupPort);
-        this.netIf = NetworkInterface.getByName(groupIf);
-        this.listenPort = listenPort;
+    public NetworkInterface getNetIf() throws SocketException {
+        return NetworkInterface.getByName(groupIf);
     }
 
-    @Override
-    public String toString() {
-        return "{" + groupAddr + ":" + netIf + "; " + listenPort + "}";
+    public SocketAddress getGroupAddr() {
+        return new InetSocketAddress(groupIP, groupPort);
     }
 }
