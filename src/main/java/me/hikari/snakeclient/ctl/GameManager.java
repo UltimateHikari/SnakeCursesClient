@@ -2,7 +2,6 @@ package me.hikari.snakeclient.ctl;
 
 import lombok.Getter;
 import me.hikari.snakeclient.data.*;
-import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakeclient.data.config.GameConfig;
 import me.hikari.snakeclient.data.config.KeyConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
@@ -10,8 +9,6 @@ import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -33,6 +30,7 @@ public class GameManager {
     @Getter
     private StateSynchronizer synchronizer = new StateSynchronizer();
     private final CommWorker communicator;
+    private final ListenWorker listener;
 
     private void startWorkers() throws IOException {
         handlers.add(scheduler.scheduleAtFixedRate(
@@ -46,7 +44,7 @@ public class GameManager {
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
         handlers.add(scheduler.schedule(
-                new ListenWorker(this, config.getNetConfig()),
+                listener,
                 0,
                 TimeUnit.MILLISECONDS
         ));
@@ -57,6 +55,7 @@ public class GameManager {
         this.ui = ui;
         this.config = config;
         this.gameList = new MetaEngine(new GameEntry(new Player(config.getPlayerConfig()), config.getEngineConfig()));
+        this.listener = new ListenWorker(this, config.getNetConfig());
         this.communicator = new CommWorker(this, config.getNetConfig(), config.getPlayerConfig().getPort());
         startWorkers();
     }
@@ -71,6 +70,7 @@ public class GameManager {
 
     public void close() throws IOException {
         handlers.forEach(h -> h.cancel(true));
+        listener.close();
         communicator.close();
         scheduler.shutdown();
         ui.close();

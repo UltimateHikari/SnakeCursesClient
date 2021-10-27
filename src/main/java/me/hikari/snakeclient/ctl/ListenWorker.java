@@ -38,9 +38,18 @@ class ListenWorker implements Runnable{
         var buf = new byte[MAX_MESSAGE_SIZE];
         while(!Thread.currentThread().isInterrupted()){
             var packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
+            try {
+                socket.receive(packet);
+            }catch (SocketException e){
+                // normal behaviour for call of this.close();
+                return;
+            }
             tryDeserializeMessage(packet);
         }
+        this.close();
+    }
+
+    public void close() throws IOException {
         socket.leaveGroup(config.getGroupAddr(), config.getNetIf());
         socket.close();
     }
