@@ -1,41 +1,47 @@
 package me.hikari.snakeclient.ctl;
 
-import com.sun.source.tree.NewArrayTree;
+import lombok.SneakyThrows;
+import me.hikari.snakeclient.data.config.NetConfig;
+import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 import java.net.*;
 
 class ListenWorker implements Runnable{
-    private final InetSocketAddress group;
-    private MulticastSocket socket;
-    private NetworkInterface netIf;
+    private static final int MAX_MESSAGE_SIZE = 1000;
+    private final NetConfig config;
+    private final MulticastSocket socket;
     private final GameManager manager;
 
-    public ListenWorker(GameManager manager, InetSocketAddress group, Integer port) throws IOException {
+    public ListenWorker(GameManager manager, NetConfig config) throws IOException {
         this.manager = manager;
-        this.group = group;
-        //todo move outside
-        this.netIf = NetworkInterface.getByName("wlan0");
-//        socket = new MulticastSocket(port);
-//        socket.joinGroup(group);
-//
-//        socket = new MulticastSocket(InetAddress.getByName(addr));
-//
-//        s.joinGroup(group, netIf);
-//        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
-//        DatagramPacket hi = new DatagramPacket(msgBytes, msgBytes.length,
-//                group, 6789);
-//        s.send(hi);
-//        // get their responses!
-//        byte[] buf = new byte[1000];
-//        DatagramPacket recv = new DatagramPacket(buf, buf.length);
-//        s.receive(recv);
-//        // OK, I'm done talking - leave the group...
-//        s.leaveGroup(group, netIf);
+        this.config = config;
+        socket = new MulticastSocket(config.getListenPort());
+        socket.joinGroup(config.getGroupAddr(), config.getNetIf());
     }
 
+    private void tryDeserializeMessage(DatagramPacket packet){
+        SnakesProto.GameMessage.AnnouncementMsg msg = null;
+        try{
+            msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
+        }catch (Exception e){
+            //TODO try better, revert serialization
+            e.printStackTrace();
+            return;
+        }
+        manager.noteAnnouncement(msg, packet.getAddress());
+    }
+
+    @SneakyThrows
     @Override
     public void run() {
-
+        var buf = new byte[MAX_MESSAGE_SIZE];
+        while(!Thread.currentThread().isInterrupted()){
+            var packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
+            tryDeserializeMessage(packet);
+        }
+        socket.leaveGroup(config.getGroupAddr(), config.getNetIf());
+        socket.close();
     }
 }

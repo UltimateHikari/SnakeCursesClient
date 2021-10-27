@@ -35,10 +35,11 @@ public class MetaEngine {
         }
     }
 
-    public void addGame(Player player, EngineConfig config) {
+    public void addGame(GameEntry entry) {
         synchronized (mapMonitor) {
+            // TODO check on duplicates from that player
             long time = System.currentTimeMillis();
-            games.put(new GameEntry(player, config), time);
+            games.put(entry, time);
             isLatest = false;
         }
     }

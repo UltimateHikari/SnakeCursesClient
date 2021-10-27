@@ -32,8 +32,9 @@ public class GameManager {
     private final PluggableUI ui;
     @Getter
     private StateSynchronizer synchronizer = new StateSynchronizer();
+    private final CommWorker communicator;
 
-    private void startWorkers() {
+    private void startWorkers() throws IOException {
         handlers.add(scheduler.scheduleAtFixedRate(
                 new UIWorker(this),
                 0,
@@ -44,20 +45,28 @@ public class GameManager {
                 0,
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
+        handlers.add(scheduler.schedule(
+                new ListenWorker(this, config.getNetConfig()),
+                0,
+                TimeUnit.MILLISECONDS
+        ));
     }
 
-    public GameManager(PluggableUI ui, GameConfig config) {
+    public GameManager(PluggableUI ui, GameConfig config) throws IOException {
         // TODO encase network stuff into NetConfig or sth
         this.ui = ui;
         this.config = config;
         this.gameList = new MetaEngine(new GameEntry(new Player(config.getPlayerConfig()), config.getEngineConfig()));
+        this.communicator = new CommWorker(this, config.getNetConfig(), config.getPlayerConfig().getPort());
         startWorkers();
     }
 
     public void start() {
         /**
-         * TODO main loop of sending/recving messages
+         * endless loop on listening inside communicator;
+         * our boy also can send stuff, but via handles for other workers
          */
+        communicator.run();
     }
 
     public void close() throws IOException {
@@ -107,9 +116,8 @@ public class GameManager {
         currentEngine.noteHostMove(dir);
     }
 
-    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg) {
-        // TODO do stuff and then
-        //gameList.addGame(player, config);
+    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg, InetAddress address) {
+        gameList.addGame(new GameEntry(msg, address));
     }
 
     public KeyConfig getKeyconfig() {

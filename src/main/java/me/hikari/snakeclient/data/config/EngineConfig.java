@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.hikari.snakeclient.data.Coord;
 import me.hikari.snakeclient.data.UIConfig;
+import me.hikari.snakes.SnakesProto;
 
 @Getter
 @RequiredArgsConstructor
@@ -35,11 +36,24 @@ public class EngineConfig implements UIConfig {
                 stateDelayMs,
                 deadFoodProb,
                 pingDelayMs,
-                nodeTimeoutMs);
+                nodeTimeoutMs
+        );
+    }
+
+    public EngineConfig(SnakesProto.GameConfig config) {
+        this(
+                new Coord(config.getWidth(), config.getHeight()),
+                config.getFoodStatic(),
+                config.getFoodPerPlayer(),
+                config.getStateDelayMs(),
+                config.getDeadFoodProb(),
+                config.getPingDelayMs(),
+                config.getNodeTimeoutMs()
+        );
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "{" + worldSize + ", " + foodStatic
                 + "x" + foodPerPlayer + ", "
                 + stateDelayMs + ", " + deadFoodProb + ", "

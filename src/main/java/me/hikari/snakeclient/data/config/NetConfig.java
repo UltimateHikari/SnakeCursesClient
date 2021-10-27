@@ -2,11 +2,13 @@ package me.hikari.snakeclient.data.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.net.*;
 
+@Getter
 public class NetConfig {
-
+    public static final int MAX_MESSAGE_SIZE = 1000;
     private final InetSocketAddress groupAddr;
     private final NetworkInterface netIf;
     private final Integer listenPort;
