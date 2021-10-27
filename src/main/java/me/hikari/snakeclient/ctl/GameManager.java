@@ -123,4 +123,8 @@ public class GameManager {
     public KeyConfig getKeyconfig() {
         return config.getKeyConfig();
     }
+
+    public void doSteer(SnakesProto.Direction direction, Peer peer) {
+
+    }
 }

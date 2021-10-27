@@ -2,6 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.SneakyThrows;
+import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
@@ -28,17 +29,19 @@ public class CommWorker implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             var packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);
-            var peer = packet.getSocketAddress();
+            var socketAddress = packet.getSocketAddress();
+            //TODO verify peer string creation
+            var peer = new Peer(packet.getAddress().toString(), packet.getPort());
             var msg = tryDeserializeMessage(packet);
-            handleMsg(msg);
-            sendAck(msg, peer);
+            handleMsg(msg, peer);
+            sendAck(msg, socketAddress);
         }
         socket.close();
     }
 
-    private void handleMsg(SnakesProto.GameMessage msg) {
+    private void handleMsg(SnakesProto.GameMessage msg, Peer peer) {
         switch (msg.getTypeCase()) {
-            case STEER -> handleSteer(msg);
+            case STEER -> handleSteer(msg, peer);
             case STATE -> handleState(msg);
             case JOIN -> handleJoin(msg);
             case ERROR -> handleError(msg);
@@ -46,8 +49,8 @@ public class CommWorker implements Runnable {
         }
     }
 
-    private void handleSteer(SnakesProto.GameMessage msg) {
-        //TODO implement
+    private void handleSteer(SnakesProto.GameMessage msg, Peer peer) {
+        manager.doSteer(msg.getSteer().getDirection(), peer);
     }
     private void handleJoin(SnakesProto.GameMessage msg) {
         //TODO implement
