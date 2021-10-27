@@ -25,7 +25,7 @@ public class CommWorker implements Runnable {
     @SneakyThrows
     @Override
     public void run() {
-        var buf = new byte[NetConfig.MAX_MESSAGE_SIZE];
+        var buf = new byte[config.getMaxMessageSize()];
         while (!Thread.currentThread().isInterrupted()) {
             var packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);

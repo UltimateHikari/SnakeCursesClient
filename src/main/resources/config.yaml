@@ -2,6 +2,7 @@ player:
   name: "host"
   port: 6062
 net:
+  max_msg_size: 1000
   group_ip: "239.192.0.4"
   group_port: 9192
   group_iface: "wlp3s0"
