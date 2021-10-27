@@ -17,18 +17,20 @@ public class Main {
         configName = "./" + name + ".yaml";
     }
 
+    public static GameConfig parseConfig() throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        mapper.findAndRegisterModules();
+        var config = mapper.readValue(new File(configName), GameConfig.class);
+        System.out.println(config);
+        return config;
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
             formConfigPath(args[0]);
         }
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
-        mapper.findAndRegisterModules();
-        GameConfig config = mapper.readValue(new File(configName), GameConfig.class);
-
-        System.out.println(config);
-
         Tui tui = new Tui();
-        GameManager manager = new GameManager(tui, config);
+        GameManager manager = new GameManager(tui, parseConfig());
         manager.start();
     }
 }

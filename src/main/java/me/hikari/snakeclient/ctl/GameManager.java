@@ -71,6 +71,7 @@ public class GameManager {
 
     public void close() throws IOException {
         handlers.forEach(h -> h.cancel(true));
+        communicator.close();
         scheduler.shutdown();
         ui.close();
     }

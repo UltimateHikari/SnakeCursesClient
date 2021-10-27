@@ -2,6 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 
@@ -9,16 +10,13 @@ import java.io.IOException;
 class UIWorker implements Runnable {
     private final GameManager manager;
 
+    @SneakyThrows
     @Override
     public void run() {
-        try {
-            if (manager.getSynchronizer().isScreenMain()) {
-                manager.getUi().showMainScreen(manager.getMetaDTO());
-            } else {
-                manager.getUi().showGameScreen(manager.getEngineDTO());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (manager.getSynchronizer().isScreenMain()) {
+            manager.getUi().showMainScreen(manager.getMetaDTO());
+        } else {
+            manager.getUi().showGameScreen(manager.getEngineDTO());
         }
     }
 }

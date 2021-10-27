@@ -22,13 +22,19 @@ public class CommWorker implements Runnable {
         socket = new DatagramSocket(port);
     }
 
+
     @SneakyThrows
     @Override
     public void run() {
         var buf = new byte[config.getMaxMsgSize()];
         while (!Thread.currentThread().isInterrupted()) {
             var packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
+            try {
+                socket.receive(packet);
+            } catch (SocketException e) {
+                // normal behaviour for call of this.close();
+                return;
+            }
             var socketAddress = packet.getSocketAddress();
             //TODO verify peer string creation
             var peer = new Peer(packet.getAddress().toString(), packet.getPort());
@@ -36,7 +42,6 @@ public class CommWorker implements Runnable {
             handleMsg(msg, peer);
             sendAck(msg, socketAddress);
         }
-        socket.close();
     }
 
     private void handleMsg(SnakesProto.GameMessage msg, Peer peer) {
@@ -83,5 +88,11 @@ public class CommWorker implements Runnable {
 
     private SnakesProto.GameMessage tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
         return SnakesProto.GameMessage.parseFrom(packet.getData());
+    }
+
+    public void close() {
+        if(!socket.isClosed()) {
+            socket.close();
+        }
     }
 }
