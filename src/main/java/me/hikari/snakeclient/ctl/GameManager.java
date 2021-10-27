@@ -126,6 +126,6 @@ public class GameManager {
     }
 
     public void doSteer(SnakesProto.Direction direction, Peer peer) {
-
+        currentEngine.notePeerMove(peer, direction);
     }
 }

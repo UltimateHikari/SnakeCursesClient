@@ -70,6 +70,12 @@ public class Engine {
     public void notePlayerMove(Player player, SnakesProto.Direction move) {
         moves.put(player, move);
     }
+    public void notePeerMove(Peer peer, SnakesProto.Direction move){
+        var player = snakeMap.keySet().stream().filter(p -> peer.equals(p)).findFirst();
+        if(player.isPresent()){
+            notePlayerMove(player.get(), move);
+        }
+    }
 
     public void replenishFood() {
         //TODO update algorithm for consulting with field
