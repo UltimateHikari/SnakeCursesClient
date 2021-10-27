@@ -1,8 +1,8 @@
 package me.hikari.snakeclient.ctl;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import me.hikari.snakeclient.data.Direction;
 import me.hikari.snakeclient.data.config.KeyConfig;
+import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 
@@ -57,7 +57,7 @@ class InputWorker implements Runnable {
             if(state.isScreenMain()){
                 manager.navUp();
             } else {
-                manager.moveSnake(Direction.UP);
+                manager.moveSnake(SnakesProto.Direction.UP);
             }
         }
 
@@ -65,19 +65,19 @@ class InputWorker implements Runnable {
             if(state.isScreenMain()){
                 manager.navDown();
             } else {
-                manager.moveSnake(Direction.DOWN);
+                manager.moveSnake(SnakesProto.Direction.DOWN);
             }
         }
 
         if(c == keys.getLeft()){
             if(!state.isScreenMain()){
-                manager.moveSnake(Direction.LEFT);
+                manager.moveSnake(SnakesProto.Direction.LEFT);
             }
         }
 
         if(c == keys.getRight()){
             if(!state.isScreenMain()){
-                manager.moveSnake(Direction.RIGHT);
+                manager.moveSnake(SnakesProto.Direction.RIGHT);
             }
         }
 

@@ -112,7 +112,7 @@ public class GameManager {
         gameList.navUp();
     }
 
-    void moveSnake(Direction dir) {
+    void moveSnake(SnakesProto.Direction dir) {
         currentEngine.noteHostMove(dir);
     }
 

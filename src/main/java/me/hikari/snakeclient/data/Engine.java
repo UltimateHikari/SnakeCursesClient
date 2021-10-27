@@ -3,6 +3,7 @@ package me.hikari.snakeclient.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;
+import me.hikari.snakes.SnakesProto;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +19,7 @@ public class Engine {
     private EngineConfig config;
     @Getter
     private final Map<Player, Snake> snakeMap = new HashMap<>();
-    private final Map<Player, Direction> moves = new HashMap<>();
+    private final Map<Player, SnakesProto.Direction> moves = new HashMap<>();
     private final List<Coord> foods = new ArrayList<>();
     private final Player host;
 
@@ -60,13 +61,13 @@ public class Engine {
 
     private Snake spawnSnake() {
         //TODO upgrade algo
-        return new Snake(new Coord(Direction.RIGHT), new Coord(5, 5), new Coord(Direction.LEFT));
+        return new Snake(new Coord(SnakesProto.Direction.RIGHT), new Coord(5, 5), new Coord(SnakesProto.Direction.LEFT));
     }
 
-    public void noteHostMove(Direction move) {
+    public void noteHostMove(SnakesProto.Direction move) {
         notePlayerMove(host, move);
     }
-    public void notePlayerMove(Player player, Direction move) {
+    public void notePlayerMove(Player player, SnakesProto.Direction move) {
         moves.put(player, move);
     }
 
@@ -94,7 +95,7 @@ public class Engine {
     }
 
     public void applyMoves() {
-        moves.forEach((Player p, Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
+        moves.forEach((Player p, SnakesProto.Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
         moves.clear();
     }
 

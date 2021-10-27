@@ -2,6 +2,7 @@ package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.hikari.snakes.SnakesProto;
 
 @AllArgsConstructor
 public class Coord {
@@ -10,7 +11,7 @@ public class Coord {
     @Getter
     private final int y;
 
-    public Coord(Direction d) {
+    public Coord(SnakesProto.Direction d) {
         switch (d) {
             case UP -> {
                 x = 0;
