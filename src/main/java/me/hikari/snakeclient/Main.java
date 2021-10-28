@@ -1,7 +1,7 @@
 package me.hikari.snakeclient;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import me.hikari.snakeclient.ctl.GameManager;
 import me.hikari.snakeclient.data.config.GameConfig;

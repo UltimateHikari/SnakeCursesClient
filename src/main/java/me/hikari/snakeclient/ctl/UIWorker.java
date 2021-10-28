@@ -4,8 +4,6 @@ package me.hikari.snakeclient.ctl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
-
 @RequiredArgsConstructor
 class UIWorker implements Runnable {
     private final GameManager manager;

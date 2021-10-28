@@ -7,7 +7,10 @@ import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketAddress;
+import java.net.SocketException;
 
 public class CommWorker implements Runnable {
     private final GameManager manager;
