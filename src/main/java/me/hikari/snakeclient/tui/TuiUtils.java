@@ -6,11 +6,10 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import me.hikari.snakeclient.data.Coord;
-import me.hikari.snakeclient.data.GameEntry;
 import me.hikari.snakeclient.data.UIConfig;
 import me.hikari.snakeclient.data.UIGameEntry;
 
-public class TuiUtils {
+class TuiUtils {
     private static final Integer BORDER_DELTA = -2;
     private static final Integer ENTRY_SHIFT = 1;
 
@@ -58,6 +57,9 @@ public class TuiUtils {
 
     public static TerminalPosition shift(TerminalPosition pos, Integer row){
         return pos.withRelative(ENTRY_SHIFT, ENTRY_SHIFT + row);
+    }
+    public static TerminalPosition center(TerminalPosition pos, TerminalSize size, Integer len){
+        return shift(pos, 0).withRelativeColumn((size.getColumns() - len)/2 - 1);
     }
 
     public static String entryDims(UIGameEntry e){

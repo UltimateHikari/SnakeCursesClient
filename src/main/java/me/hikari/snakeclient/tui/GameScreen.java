@@ -8,22 +8,23 @@ import lombok.RequiredArgsConstructor;
 import me.hikari.snakeclient.data.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class GameScreen {
+class GameScreen {
     private static final Integer HEADER_ROWS = 3;
+    private static final Integer FOOTER_ROWS = 3;
     private static final Integer INFO_COLS = 25;
     private static final Integer INFO_ROWS = 10;
     private static final TerminalPosition IMAGE_SHIFT = new TerminalPosition(1, 1);
     private static final Integer HEADER_TEXT_ROW = 1;
 
     private final Screen screen;
-    private TerminalSize size;
     private final DTO2Image converter;
+    private final String footer;
+
+    private TerminalSize size;
     private Brush brush = new Brush();
 
     private void drawHeader(TextGraphics tg) {
@@ -32,8 +33,8 @@ public class GameScreen {
                 tg,
                 pos,
                 new TerminalSize(size.getColumns(), HEADER_ROWS));
-        String data = String.valueOf(System.currentTimeMillis());
-        tg.putString(size.getColumns() / 2 - data.length() / 2, HEADER_TEXT_ROW, data);
+        String data = "SnakeCursesClient::Game";
+        tg.putString(TuiUtils.center(pos, size, data.length()), data);
         tg.putString(pos, "Header");
     }
 
@@ -41,7 +42,7 @@ public class GameScreen {
         var pos = new TerminalPosition(0, HEADER_ROWS);
         var border = new TerminalSize(
                 size.getColumns() - INFO_COLS,
-                size.getRows() - HEADER_ROWS);
+                size.getRows() - HEADER_ROWS - FOOTER_ROWS);
         TuiUtils.drawFancyBoundary(tg, pos, border);
         var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getUiConfig().getWorldSize());
         TuiUtils.drawFancyBoundary(tg, pos, TuiUtils.addBorder(viewSize));
@@ -65,10 +66,10 @@ public class GameScreen {
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(INFO_COLS, size.getRows() - HEADER_ROWS - INFO_ROWS));
+                new TerminalSize(INFO_COLS, size.getRows() - HEADER_ROWS - INFO_ROWS - FOOTER_ROWS));
         tg.putString(pos, "Highscores");
         try {
-            Player [] sPlayers = players.stream()
+            Player[] sPlayers = players.stream()
                     .sorted(Comparator.comparing(Player::getScore))
                     .toArray(size -> new Player[size]);
             for (int i = 0; i < sPlayers.length; i++) {
@@ -76,7 +77,7 @@ public class GameScreen {
                 tg.putString(TuiUtils.shift(pos, i), playerScore(sPlayers[i]));
             }
             tg.clearModifiers();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
@@ -87,13 +88,22 @@ public class GameScreen {
     }
 
     public void show(EngineDTO dto) throws IOException {
-        //TODO make footer with controls, like in htop; same for mainscreen
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);
+        drawFooter(tg);
         drawField(tg, dto);
         drawInfo(tg, dto.getUiConfig());
         drawScores(tg, dto.getSnakeMap().keySet());
         screen.refresh();
+    }
+
+    private void drawFooter(TextGraphics tg) {
+        TerminalPosition pos = new TerminalPosition(0, size.getRows() - FOOTER_ROWS);
+        TuiUtils.drawFancyBoundary(
+                tg,
+                pos,
+                new TerminalSize(size.getColumns(), FOOTER_ROWS));
+        tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
     }
 }

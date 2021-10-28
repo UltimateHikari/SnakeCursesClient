@@ -29,8 +29,9 @@ public class Main {
         if (args.length > 0) {
             formConfigPath(args[0]);
         }
-        Tui tui = new Tui();
-        GameManager manager = new GameManager(tui, parseConfig());
+        var config = parseConfig();
+        Tui tui = new Tui(config.getKeyConfig());
+        GameManager manager = new GameManager(tui, config);
         manager.start();
     }
 }

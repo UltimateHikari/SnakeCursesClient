@@ -5,7 +5,7 @@ import me.hikari.snakeclient.data.Player;
 
 import java.util.*;
 
-public class Brush {
+class Brush {
     private Map<Player, TextColor> colors = new HashMap<>();
     private List<TextColor> unused;
 

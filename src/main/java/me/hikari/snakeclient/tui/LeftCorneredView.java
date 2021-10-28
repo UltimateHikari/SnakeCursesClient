@@ -11,7 +11,7 @@ import me.hikari.snakeclient.data.EngineDTO;
 import me.hikari.snakeclient.data.Player;
 import me.hikari.snakeclient.data.UISnake;
 
-public class LeftCorneredView implements DTO2Image {
+class LeftCorneredView implements DTO2Image {
     private TerminalSize size;
     private TextImage image;
     private Brush brush;

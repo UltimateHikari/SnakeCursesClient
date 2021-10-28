@@ -6,21 +6,22 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.GameEntry;
 import me.hikari.snakeclient.data.MetaEngineDTO;
 import me.hikari.snakeclient.data.UIGameEntry;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class MainScreen {
+class MainScreen {
     private static final Integer HEADER_ROWS = 3;
+    private static final Integer FOOTER_ROWS = 3;
     private static final Integer CONFIG_COLS = 40;
     private static final Integer HEADER_TEXT_ROW = 1;
     private static final String NEW_GAME = "New game: ";
 
     private final Screen screen;
-    //private final EventContainer;
+    private final String footer;
+
     private TerminalSize size;
     private UIGameEntry lastSelectedEntry = null;
 
@@ -36,6 +37,7 @@ public class MainScreen {
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);
+        drawFooter(tg);
         drawJoin(tg, dto);
         drawConfig(tg);
         screen.refresh();
@@ -66,7 +68,7 @@ public class MainScreen {
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(size.getColumns() - CONFIG_COLS, size.getRows() - HEADER_ROWS));
+                new TerminalSize(size.getColumns() - CONFIG_COLS, size.getRows() - HEADER_ROWS - FOOTER_ROWS));
         tg.putString(pos, "Join Game");
         int configRowShift = 0;
         putTextWithCursor(tg, pos, configRowShift, dto.getDefaultEntry(), NEW_GAME);
@@ -81,7 +83,7 @@ public class MainScreen {
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(CONFIG_COLS, size.getRows() - HEADER_ROWS));
+                new TerminalSize(CONFIG_COLS, size.getRows() - HEADER_ROWS - FOOTER_ROWS));
         tg.putString(pos, "Game config");
         TuiUtils.putFullGameEntry(tg, TuiUtils.shift(pos, 0), lastSelectedEntry);
     }
@@ -92,9 +94,17 @@ public class MainScreen {
                 tg,
                 pos,
                 new TerminalSize(size.getColumns(), HEADER_ROWS));
-        String data = "SnakeCursesClient";
-        tg.putString(size.getColumns() / 2 - data.length() / 2, HEADER_TEXT_ROW, data);
+        String data = "SnakeCursesClient::MainMenu";
+        tg.putString(TuiUtils.center(pos, size, data.length()), data);
         tg.putString(pos, "Header");
     }
 
+    private void drawFooter(TextGraphics tg) {
+        TerminalPosition pos = new TerminalPosition(0, size.getRows() - FOOTER_ROWS);
+        TuiUtils.drawFancyBoundary(
+                tg,
+                pos,
+                new TerminalSize(size.getColumns(), FOOTER_ROWS));
+        tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
+    }
 }

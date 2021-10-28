@@ -7,6 +7,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import me.hikari.snakeclient.data.EngineDTO;
 import me.hikari.snakeclient.data.MetaEngineDTO;
+import me.hikari.snakeclient.data.config.KeyConfig;
 
 import java.io.IOException;
 
@@ -17,11 +18,12 @@ public class Tui implements PluggableUI {
     private final GameScreen gameScreen;
     private final MainScreen mainScreen;
 
-    public Tui() throws IOException {
+    public Tui(KeyConfig config) throws IOException {
         Terminal terminal = new DefaultTerminalFactory().createTerminal();
-        screen = new TerminalScreen(terminal);
-        gameScreen = new GameScreen(screen, new LeftCorneredView());
-        mainScreen = new MainScreen(screen);
+        this.screen = new TerminalScreen(terminal);
+        var footer = new FooterFactory(config);
+        this.gameScreen = new GameScreen(screen, new LeftCorneredView(), footer.getGameFooter());
+        this.mainScreen = new MainScreen(screen, footer.getMainFooter());
         screen.startScreen();
     }
 
