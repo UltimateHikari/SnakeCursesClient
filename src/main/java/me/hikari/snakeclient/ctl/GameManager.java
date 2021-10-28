@@ -51,7 +51,6 @@ public class GameManager {
     }
 
     public GameManager(PluggableUI ui, GameConfig config) throws IOException {
-        // TODO encase network stuff into NetConfig or sth
         this.ui = ui;
         this.config = config;
         this.gameList = new MetaEngine(new GameEntry(new Player(config.getPlayerConfig()), config.getEngineConfig()));
@@ -99,10 +98,8 @@ public class GameManager {
     EngineDTO getEngineDTO() {
         if (currentEngine != null) {
             return currentEngine.getDTO();
-        } else {
-            // TODO mb throw exception on access error?
-            return null;
         }
+        throw new IllegalStateException("No game is active");
     }
 
     void navDown() {

@@ -46,8 +46,11 @@ public class Engine {
         private final Snake snake;
     }
 
+    /**
+     * TODO::Commworker.handleJoin
+     */
+
     public Engine(GameEntry entry) {
-        //TODO refactor for join
         this.config = entry.getConfig();
         this.host = entry.getPlayer();
         addPlayer(entry.getPlayer());
@@ -59,8 +62,13 @@ public class Engine {
         snakeMap.put(player, snake);
     }
 
+    /**
+     * TODO
+     * update spawning algo
+     */
+
     private Snake spawnSnake() {
-        //TODO upgrade algo
+
         return new Snake(new Coord(SnakesProto.Direction.RIGHT), new Coord(5, 5), new Coord(SnakesProto.Direction.LEFT));
     }
 
@@ -77,8 +85,12 @@ public class Engine {
         }
     }
 
+    /**
+     * TODO
+     * update food spawn algo
+     */
+
     public void replenishFood() {
-        //TODO update algorithm for consulting with field
         synchronized (mapMonitor) {
             var r = new Random();
             while (foods.size() < config.getFoodStatic()) {
@@ -105,6 +117,12 @@ public class Engine {
         moves.clear();
     }
 
+    /**
+     * TODO
+     * change logic in list.forEach
+     * to logic from snakes.txt
+     */
+
     public void moveSnakes() {
         synchronized (mapMonitor) {
             var list = new ArrayList<MoveResult>();
@@ -117,7 +135,6 @@ public class Engine {
                 }
             });
             list.forEach((MoveResult m) -> {
-                // TODO modify accordingly with .txt
                 if (field.isCellSnakeCollided(m.getCoord())) {
                     m.getSnake().showYourself(this::spawnFoodWithProb, worldSize);
                     m.getSnake().die();

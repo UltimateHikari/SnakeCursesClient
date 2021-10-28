@@ -1,13 +1,12 @@
 package me.hikari.snakeclient.ctl;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.SneakyThrows;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.MulticastSocket;
-import java.net.SocketException;
+import java.net.*;
 
 class ListenWorker implements Runnable{
     private static final int MAX_MESSAGE_SIZE = 1000;
@@ -22,15 +21,10 @@ class ListenWorker implements Runnable{
         socket.joinGroup(config.getGroupAddr(), config.getNetIf());
     }
 
-    private void tryDeserializeMessage(DatagramPacket packet){
+    private void tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
         SnakesProto.GameMessage.AnnouncementMsg msg = null;
-        try{
-            msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
-        }catch (Exception e){
-            //TODO try better, revert serialization
-            e.printStackTrace();
-            return;
-        }
+        // SneakyThrow on failure
+        msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
         manager.noteAnnouncement(msg, packet.getAddress());
     }
 

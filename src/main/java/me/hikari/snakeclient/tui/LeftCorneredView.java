@@ -38,7 +38,7 @@ class LeftCorneredView implements DTO2Image {
         this.brush = brush;
 
         for (Coord f : dto.getFoods()) {
-            //TODO-1 move char to config
+            // TODO::Tui
             placeCharacter(coord2pos(f), 'F', TextColor.ANSI.YELLOW_BRIGHT);
         }
         dto.getSnakeMap().forEach((p, s) -> putSnake(p, s, worldSize));

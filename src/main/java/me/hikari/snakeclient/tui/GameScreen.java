@@ -5,9 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.EngineDTO;
-import me.hikari.snakeclient.data.Player;
-import me.hikari.snakeclient.data.UIConfig;
+import me.hikari.snakeclient.data.*;
 
 import java.io.IOException;
 import java.util.Comparator;

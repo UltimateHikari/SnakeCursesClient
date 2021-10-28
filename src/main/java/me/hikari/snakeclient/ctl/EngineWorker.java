@@ -7,6 +7,11 @@ import me.hikari.snakeclient.data.Engine;
 public class EngineWorker implements Runnable {
     private Engine engine;
 
+    /**
+     * TODO
+     * add graceful exit when snakes are broken
+     */
+
     @Override
     public void run() {
         engine.replenishFood();
@@ -14,7 +19,6 @@ public class EngineWorker implements Runnable {
         try {
             engine.moveSnakes();
         }catch (Exception e){
-            //TODO add graceful exit, now its for swift tests
             e.printStackTrace();
             System.exit(-1);
         }

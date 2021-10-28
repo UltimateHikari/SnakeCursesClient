@@ -4,12 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * minor TODO:
+ * accept EngineConfig[] instead of single;
+ * change MetaEngine Logic accordingly
+ */
+
 @Getter
 @ToString
 public class GameConfig {
     private final PlayerConfig playerConfig;
     private final NetConfig netConfig;
-    //TODO accept EngineConfig []
     private final EngineConfig engineConfig;
     private final KeyConfig keyConfig;
 

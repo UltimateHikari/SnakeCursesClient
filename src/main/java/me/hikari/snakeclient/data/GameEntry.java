@@ -21,17 +21,26 @@ public class GameEntry implements UIGameEntry {
         this.config = config;
     }
 
+    /**
+     * minor TODO
+     * check canJoin
+     */
+
     public GameEntry(SnakesProto.GameMessage.AnnouncementMsg msg, InetAddress address){
         joinAddress = address;
         this.config = new EngineConfig(msg.getConfig());
         for(SnakesProto.GamePlayer p : msg.getPlayers().getPlayersList()){
             players.add(new Player(p));
         }
-        // TODO stop ignoring canjoin
     }
 
+    /**
+     * TODO
+     * refactor to getting host on tui side;
+     * left for compat reasons
+     */
+
     public Player getPlayer(){
-        // TODO for compat reasons, refactor this and consumers of this
         return players.get(0);
     }
 }

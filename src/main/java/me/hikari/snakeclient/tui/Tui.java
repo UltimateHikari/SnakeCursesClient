@@ -18,6 +18,13 @@ public class Tui implements PluggableUI {
     private final GameScreen gameScreen;
     private final MainScreen mainScreen;
 
+    /**
+     * TODO
+     * Pass configs for:
+     *  both grids
+     *  DTO2Image
+     */
+
     public Tui(KeyConfig config) throws IOException {
         Terminal terminal = new DefaultTerminalFactory().createTerminal();
         this.screen = new TerminalScreen(terminal);

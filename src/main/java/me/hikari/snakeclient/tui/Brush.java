@@ -26,10 +26,15 @@ class Brush {
         initUnused();
     }
 
+    /**
+     * TODO:
+     * regenerate colors on unused.size() = 0;
+     * repeated colors are better than exception
+     */
+
     public TextColor getColor(Player p){
         if(!colors.containsKey(p)){
             Collections.shuffle(unused);
-            //TODO if size = 0? exception?
             colors.put(p, unused.remove(unused.size() - 1));
         }
         return colors.get(p);
