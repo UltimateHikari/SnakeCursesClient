@@ -13,36 +13,30 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 class GameScreen {
-    private static final Integer HEADER_ROWS = 3;
-    private static final Integer FOOTER_ROWS = 3;
-    private static final Integer INFO_COLS = 25;
-    private static final Integer INFO_ROWS = 10;
     private static final TerminalPosition IMAGE_SHIFT = new TerminalPosition(1, 1);
-    private static final Integer HEADER_TEXT_ROW = 1;
 
     private final Screen screen;
     private final DTO2Image converter;
     private final String footer;
+    private final GameGrid grid = new GameGrid();
 
     private TerminalSize size;
     private Brush brush = new Brush();
 
     private void drawHeader(TextGraphics tg) {
-        TerminalPosition pos = new TerminalPosition(0, 0);
+        var pos = grid.getHeaderPos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(size.getColumns(), HEADER_ROWS));
-        String data = "SnakeCursesClient::Game";
+                grid.getHeaderSize(size));
+        String data = grid.HEADER;
         tg.putString(TuiUtils.center(pos, size, data.length()), data);
         tg.putString(pos, "Header");
     }
 
     private void drawField(TextGraphics tg, EngineDTO dto) {
-        var pos = new TerminalPosition(0, HEADER_ROWS);
-        var border = new TerminalSize(
-                size.getColumns() - INFO_COLS,
-                size.getRows() - HEADER_ROWS - FOOTER_ROWS);
+        var pos = grid.getFieldPos(size);
+        var border = grid.getFieldSize(size);
         TuiUtils.drawFancyBoundary(tg, pos, border);
         var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getUiConfig().getWorldSize());
         TuiUtils.drawFancyBoundary(tg, pos, TuiUtils.addBorder(viewSize));
@@ -52,35 +46,31 @@ class GameScreen {
     }
 
     private void drawInfo(TextGraphics tg, UIConfig config) {
-        TerminalPosition pos = new TerminalPosition(size.getColumns() - INFO_COLS, HEADER_ROWS);
+        var pos = grid.getInfoPos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(INFO_COLS, INFO_ROWS));
+                grid.getInfoSize(size));
         tg.putString(pos, "Info");
         TuiUtils.putFullConfig(tg, TuiUtils.shift(pos, 0), config);
     }
 
     private void drawScores(TextGraphics tg, Set<Player> players) {
-        TerminalPosition pos = new TerminalPosition(size.getColumns() - INFO_COLS, HEADER_ROWS + INFO_ROWS);
+        var pos = grid.getScorePos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(INFO_COLS, size.getRows() - HEADER_ROWS - INFO_ROWS - FOOTER_ROWS));
+                grid.getScoreSize(size));
         tg.putString(pos, "Highscores");
-        try {
-            Player[] sPlayers = players.stream()
-                    .sorted(Comparator.comparing(Player::getScore))
-                    .toArray(size -> new Player[size]);
-            for (int i = 0; i < sPlayers.length; i++) {
-                tg.setForegroundColor(brush.getColor(sPlayers[i]));
-                tg.putString(TuiUtils.shift(pos, i), playerScore(sPlayers[i]));
-            }
-            tg.clearModifiers();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
+
+        Player[] sPlayers = players.stream()
+                .sorted(Comparator.comparing(Player::getScore))
+                .toArray(size -> new Player[size]);
+        for (int i = 0; i < sPlayers.length; i++) {
+            tg.setForegroundColor(brush.getColor(sPlayers[i]));
+            tg.putString(TuiUtils.shift(pos, i), playerScore(sPlayers[i]));
         }
+        tg.clearModifiers();
     }
 
     private String playerScore(Player p) {
@@ -99,11 +89,11 @@ class GameScreen {
     }
 
     private void drawFooter(TextGraphics tg) {
-        TerminalPosition pos = new TerminalPosition(0, size.getRows() - FOOTER_ROWS);
+        var pos = grid.getFooterPos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
-                new TerminalSize(size.getColumns(), FOOTER_ROWS));
+                grid.getFooterSize(size));
         tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
     }
 }
