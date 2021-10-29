@@ -1,5 +1,6 @@
 package me.hikari;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import me.hikari.snakes.SnakesProto.GameMessage.StateMsg;
 import me.hikari.snakes.SnakesProto.GameState.Snake;
 import me.hikari.snakes.SnakesProto.GameState.Snake.SnakeState;
@@ -11,7 +12,7 @@ import static me.hikari.snakes.SnakesProto.*;
 public class GenerateStateMsgTest {
     /** Генерирует пример сообщения с состоянием, соответствующим картинке example1.png */
     @Test
-    public void testGenerateStateMsg() {
+    public void testGenerateStateMsg() throws InvalidProtocolBufferException {
         GameConfig config = GameConfig.newBuilder()
                 .setWidth(10)
                 .setHeight(10)
@@ -56,6 +57,7 @@ public class GenerateStateMsgTest {
 
         byte[] bytesToSendViaDatagramPacket = gameMessage.toByteArray();
         Assert.assertEquals(81, bytesToSendViaDatagramPacket.length);
+        var msg = GameMessage.parseFrom(bytesToSendViaDatagramPacket);
     }
 
     private GameState.Coord coord(int x, int y) {

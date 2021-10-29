@@ -7,6 +7,7 @@ import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.ByteBuffer;
 
 class ListenWorker implements Runnable{
     private static final int MAX_MESSAGE_SIZE = 1000;
@@ -22,15 +23,13 @@ class ListenWorker implements Runnable{
     }
 
     private void tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
-        SnakesProto.GameMessage.AnnouncementMsg msg = null;
         // SneakyThrow on failure
-        try {
-            msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
-        }catch(Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
-        manager.noteAnnouncement(msg, packet.getAddress());
+        var byteBuf = ByteBuffer.wrap(packet.getData());
+        var len = byteBuf.getInt();
+        var buf = new byte[len];
+        byteBuf.get(buf, 0, len);
+        var msg = SnakesProto.GameMessage.parseFrom(buf);
+        manager.noteAnnouncement(msg.getAnnouncement(), packet.getAddress());
     }
 
     @SneakyThrows

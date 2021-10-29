@@ -11,13 +11,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 
 public class CommWorker implements Runnable {
     private final GameManager manager;
     private final NetConfig config;
     private final Integer port;
     private final DatagramSocket socket;
-    private long msg_seq = 0;
+    private long msg_seq = 1;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -104,11 +105,10 @@ public class CommWorker implements Runnable {
         }
     }
 
-    public void spam(SnakesProto.GameState state) throws IOException {
-        var stateMsg = SnakesProto.GameMessage.StateMsg.newBuilder()
-                .setState(state).build();
-        var buf = SnakesProto.GameMessage.newBuilder()
-                .setState(stateMsg).setMsgSeq(msg_seq).build().toByteArray();
+    public void spam(SnakesProto.GameMessage.AnnouncementMsg announce) throws IOException {
+        var msg = SnakesProto.GameMessage.newBuilder()
+                .setAnnouncement(announce).setMsgSeq(msg_seq).build().toByteArray();
+        var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msg.length).put(msg).array();
         var packet = new DatagramPacket(buf, buf.length, config.getGroupAddr());
         socket.send(packet);
     }

@@ -15,7 +15,7 @@ public class AnnounceWorker implements Runnable {
     public void run() {
         if (!manager.getSynchronizer().isScreenMain()) {
             if (localPlayer.isMaster()) {
-                communicator.spam(manager.getEngineDTO().retrieveState());
+                communicator.spam(manager.getEngineDTO().retrieveAnnouncement());
             }
         }
     }

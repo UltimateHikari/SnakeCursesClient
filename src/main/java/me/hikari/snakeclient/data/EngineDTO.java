@@ -1,5 +1,6 @@
 package me.hikari.snakeclient.data;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;
@@ -23,7 +24,14 @@ public class EngineDTO implements UIEngineDTO{
                 .build();
     }
 
-    public SnakesProto.GameState retrieveState(){
+    public SnakesProto.GameMessage.AnnouncementMsg retrieveAnnouncement(){
+        return SnakesProto.GameMessage.AnnouncementMsg.newBuilder()
+                .setPlayers(retrievePlayers())
+                .setConfig(((EngineConfig)config).retrieve())
+                .build();
+    }
+
+    private SnakesProto.GameState getState(){
         return SnakesProto.GameState
                 .newBuilder()
                 .setStateOrder(stateOrder)
@@ -32,5 +40,9 @@ public class EngineDTO implements UIEngineDTO{
                 .setPlayers(retrievePlayers())
                 .setConfig(((EngineConfig)config).retrieve())
                 .build();
+    }
+
+    public SnakesProto.GameMessage.StateMsg retrieveState(){
+        return SnakesProto.GameMessage.StateMsg.newBuilder().setState(getState()).build();
     }
 }
