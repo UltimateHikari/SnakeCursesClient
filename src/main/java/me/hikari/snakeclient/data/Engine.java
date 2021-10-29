@@ -66,8 +66,8 @@ public class Engine {
     }
 
     public void addPlayer(Player player) {
-        Snake snake = spawnSnake();
-        snakeMap.put(player, snake);
+        this.snakes.add(spawnSnake(player.getId()));
+        this.players.add(player);
     }
 
     /**
@@ -76,9 +76,9 @@ public class Engine {
      * pass player id
      */
 
-    private Snake spawnSnake() {
+    private Snake spawnSnake(Integer id) {
 
-        return new Snake(0, new Coord(SnakesProto.Direction.RIGHT),
+        return new Snake(id, new Coord(SnakesProto.Direction.RIGHT),
                 new Coord(5, 5), new Coord(SnakesProto.Direction.LEFT));
     }
 

@@ -79,7 +79,7 @@ public class Snake implements UISnake {
 
     public boolean isDead() {
         //TODO::Engine
-        return true;
+        return false;
     }
 
 }
