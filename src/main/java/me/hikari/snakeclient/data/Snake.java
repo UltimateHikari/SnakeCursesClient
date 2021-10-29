@@ -58,15 +58,7 @@ public class Snake implements UISnake {
         }
     }
 
-    public void die() {
-        //TODO::Engine
-        return;
-    }
-
     public void showYourself(Consumer<Coord> placer, Coord world) {
-        if (isDead()) {
-            return;
-        }
         var iter = points.iterator();
         var pos = iter.next();
         while (iter.hasNext()) {
@@ -75,11 +67,6 @@ public class Snake implements UISnake {
         }
         //safe to say, there is no snakes w/size = 1
         placer.accept(pos);
-    }
-
-    public boolean isDead() {
-        //TODO::Engine
-        return false;
     }
 
 }

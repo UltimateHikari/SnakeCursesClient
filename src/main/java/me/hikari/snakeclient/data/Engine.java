@@ -20,12 +20,9 @@ public class Engine {
 
     private EngineConfig config;
 
-    @Getter //TODO: deprecated
-    private final Map<Player, Snake> snakeMap = new HashMap<>();
-
     private List<Player> players = new ArrayList<>();
-    private List<Snake> snakes = new ArrayList<>();
-    private Map<Player, SnakesProto.Direction> moves = new HashMap<>();
+    private List<Snake> snakes = new LinkedList<>();
+    private Map<Integer, SnakesProto.Direction> moves = new HashMap<>();
     private List<Coord> foods = new ArrayList<>();
     private final Player host;
 
@@ -48,8 +45,6 @@ public class Engine {
     private class MoveResult {
         @Getter
         private final Coord coord;
-        @Getter
-        private final Player player;
         @Getter
         private final Snake snake;
     }
@@ -85,11 +80,13 @@ public class Engine {
     public void noteHostMove(SnakesProto.Direction move) {
         notePlayerMove(host, move);
     }
-    public void notePlayerMove(Player player, SnakesProto.Direction move) {
-        moves.put(player, move);
+
+    private void notePlayerMove(Player player, SnakesProto.Direction move) {
+        moves.put(player.getId(), move);
     }
-    public void notePeerMove(Peer peer, SnakesProto.Direction move){
-        var player = snakeMap.keySet().stream().filter(p -> peer.equals(p)).findFirst();
+
+    public void notePeerMove(Peer peer, SnakesProto.Direction move) {
+        var player = players.stream().filter(p -> peer.equals(p)).findFirst();
         player.ifPresent(value -> notePlayerMove(value, move));
     }
 
@@ -111,30 +108,27 @@ public class Engine {
         }
     }
 
-    public void removeFood(Coord f){
-        for(int i = 0; i < foods.size(); i++){
-            if(f.equals(foods.get(i))){
+    public void removeFood(Coord f) {
+        for (int i = 0; i < foods.size(); i++) {
+            if (f.equals(foods.get(i))) {
                 foods.remove(i);
             }
         }
     }
 
-    public void doStep(){
+    public void doStep() {
         replenishFood();
         applyMoves();
         moveSnakes();
     }
 
     private void applyMoves() {
-        moves.forEach((Player p, SnakesProto.Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
+        moves.forEach((Integer p, SnakesProto.Direction d) -> {
+            var snake = snakes.stream().filter(s -> s.getPlayerID().equals(p)).findFirst();
+            snake.ifPresent(value -> value.turnHead(new Coord(d)));
+        });
         moves.clear();
     }
-
-    /**
-     * TODO
-     * reconsider having snakeMap, too lazy for binding
-     * @param gameState
-     */
 
     @Synchronized("stateLock")
     public void applyState(SnakesProto.GameState gameState) {
@@ -153,8 +147,7 @@ public class Engine {
 
     /**
      * TODO
-     * change logic in list.forEach
-     * to logic from snakes.txt
+     * add score for murderer in collision
      */
 
     @Synchronized("stateLock")
@@ -162,23 +155,35 @@ public class Engine {
         var list = new ArrayList<MoveResult>();
         var worldSize = config.getWorldSize();
         var field = new FieldRepresentation(worldSize, foods);
-        snakeMap.forEach((Player p, Snake s) -> {
-            if(!s.isDead()) {
-                list.add(new MoveResult(s.moveHead(worldSize), p, s));
-                s.showYourself(field::putSnakeCell, worldSize);
-            }
+        snakes.forEach(s -> s.showYourself(field::putSnakeCell, worldSize));
+        snakes.forEach(s -> {
+            var head = s.moveHead(worldSize);
+            list.add(new MoveResult(head, s));
+            field.putSnakeCell(head);
         });
+
         list.forEach((MoveResult m) -> {
-            if (field.isCellSnakeCollided(m.getCoord())) {
-                m.getSnake().showYourself(this::spawnFoodWithProb, worldSize);
-                m.getSnake().die();
-                return;
-            }
+            var head = m.getCoord();
+
             if (!field.isCellFoodCollided(m.getCoord())) {
                 m.getSnake().dropTail();
             } else {
-                m.getPlayer().score();
+                var player = players.stream()
+                        .filter(p -> p.getId().equals(m.getSnake().getPlayerID())).findFirst();
+                if (player.isPresent()) {
+                    player.get().score();
+                }
                 removeFood(m.getCoord());
+            }
+
+            if (field.isCellSnakeCollided(head)) {
+                m.getSnake().showYourself(c -> {
+                    if (c != head) {
+                        this.spawnFoodWithProb(c);
+                    }
+                }, worldSize);
+                snakes.remove(m.getSnake());
+                return;
             }
         });
         replenishFood();
@@ -189,7 +194,7 @@ public class Engine {
 
     private void spawnFoodWithProb(Coord coord) {
         Random random = ThreadLocalRandom.current();
-        if(config.getDeadFoodProb() > (float)random.nextInt(PRECISION)/PRECISION){
+        if (config.getDeadFoodProb() > (float) random.nextInt(PRECISION) / PRECISION) {
             foods.add(coord);
         }
     }
