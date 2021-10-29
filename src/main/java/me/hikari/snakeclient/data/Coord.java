@@ -36,6 +36,10 @@ public class Coord {
         }
     }
 
+    public Coord(SnakesProto.GameState.Coord c) {
+        this(c.getX(), c.getY());
+    }
+
     public Coord withRelative(Coord c, Coord world) {
         return new Coord((x + c.x + world.x) % world.x, (y + c.y + world.y) % world.y);
     }

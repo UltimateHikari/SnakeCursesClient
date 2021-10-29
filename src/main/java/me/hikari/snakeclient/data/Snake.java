@@ -1,40 +1,48 @@
 package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
+import me.hikari.snakes.SnakesProto;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.Consumer;
-
-enum SnakeState{
-    ALIVE,
-    ZOMBIE,
-    DEAD;
-}
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class Snake implements UISnake{
-    private SnakeState state;
+public class Snake implements UISnake {
+    private Integer playerID;
+    private SnakesProto.GameState.Snake.SnakeState state;
     private Coord headDirection;
     private LinkedList<Coord> points; // same logic as in protobuf for compat
 
-    public Snake(Coord direction, Coord head, Coord tailShift) {
-        this(SnakeState.ALIVE, direction, new LinkedList<>(Arrays.asList(head, tailShift)));
+    public Snake(Integer playerID, Coord direction, Coord head, Coord tailShift) {
+        this(
+                playerID,
+                SnakesProto.GameState.Snake.SnakeState.ALIVE,
+                direction,
+                new LinkedList<>(Arrays.asList(head, tailShift))
+        );
     }
 
     public Snake(Snake s) {
-        this(s.state, s.headDirection, (LinkedList<Coord>) s.points.clone());
+        this(s.playerID, s.state, s.headDirection, (LinkedList<Coord>) s.points.clone());
+    }
+
+    public Snake(SnakesProto.GameState.Snake snake) {
+        this(
+                snake.getPlayerId(),
+                snake.getState(),
+                new Coord(snake.getHeadDirection()),
+                (LinkedList<Coord>) snake.getPointsList()
+                        .stream().map(Coord::new).collect(Collectors.toUnmodifiableList())
+        );
     }
 
     public Coord moveHead(Coord world) {
-        if(state != SnakeState.DEAD) {
-            var newHead = points.get(0).withRelative(headDirection, world);
-            points.set(0, headDirection.withReverse());
-            points.addFirst(newHead);
-            return newHead;
-        }
-        //hoping for cautious use outside
-        return points.get(0);
+        var newHead = points.get(0).withRelative(headDirection, world);
+        points.set(0, headDirection.withReverse());
+        points.addFirst(newHead);
+        return newHead;
     }
 
     public void dropTail() {
@@ -42,24 +50,19 @@ public class Snake implements UISnake{
     }
 
     public void turnHead(Coord direction) {
-        if (state == SnakeState.ALIVE && !direction.withReverse().equals(headDirection)) {
+        if (!direction.withReverse().equals(headDirection)) {
             //preventing neck-eating
             headDirection = direction;
         }
     }
 
-    public void die(){
-        state = SnakeState.DEAD;
-    }
-
-    public void zombie(){
-        if(state != SnakeState.DEAD){
-            state = SnakeState.ZOMBIE;
-        }
+    public void die() {
+        //TODO::Engine
+        return;
     }
 
     public void showYourself(Consumer<Coord> placer, Coord world) {
-        if(isDead()){
+        if (isDead()) {
             return;
         }
         var iter = points.iterator();
@@ -72,8 +75,9 @@ public class Snake implements UISnake{
         placer.accept(pos);
     }
 
-    public boolean isDead(){
-        return state == SnakeState.DEAD;
+    public boolean isDead() {
+        //TODO::Engine
+        return true;
     }
 
 }
