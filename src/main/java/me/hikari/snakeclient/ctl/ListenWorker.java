@@ -24,7 +24,12 @@ class ListenWorker implements Runnable{
     private void tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
         SnakesProto.GameMessage.AnnouncementMsg msg = null;
         // SneakyThrow on failure
-        msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
+        try {
+            msg = SnakesProto.GameMessage.AnnouncementMsg.parseFrom(packet.getData());
+        }catch(Exception e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
         manager.noteAnnouncement(msg, packet.getAddress());
     }
 

@@ -6,7 +6,7 @@ net:
   groupIP: "239.192.0.4"
   groupPort: 9192
   groupIf: "wlp3s0"
-  listenPort: 6061
+  listenPort: 9192
 engine:
   width: 40
   height: 20
