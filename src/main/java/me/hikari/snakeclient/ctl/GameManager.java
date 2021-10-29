@@ -24,6 +24,7 @@ public class GameManager {
 
     private final GameConfig config;
     private Engine currentEngine = null;
+    private Player localPlayer;
     private MetaEngine gameList;
     @Getter
     private final PluggableUI ui;
@@ -53,7 +54,8 @@ public class GameManager {
     public GameManager(PluggableUI ui, GameConfig config) throws IOException {
         this.ui = ui;
         this.config = config;
-        this.gameList = new MetaEngine(new GameEntry(new Player(config.getPlayerConfig()), config.getEngineConfig()));
+        this.localPlayer = new Player(config.getPlayerConfig());
+        this.gameList = new MetaEngine(new GameEntry(localPlayer, config.getEngineConfig()));
         this.listener = new ListenWorker(this, config.getNetConfig());
         this.communicator = new CommWorker(this, config.getNetConfig(), config.getPlayerConfig().getPort());
         startWorkers();
@@ -77,12 +79,21 @@ public class GameManager {
 
     void startGame() {
         var entry = gameList.getSelectedEntry();
-        currentEngine = new Engine(entry);
+        localPlayer.reset();
+        if (entry.getJoinAddress() != null) {
+            // TODO: send join message; wait for response; join;
+        }
+        currentEngine = new Engine(entry, localPlayer);
+        if (localPlayer.isMaster()) {
+            spinEngine(entry.getConfig().getStateDelayMs());
+        }
+    }
 
+    private void spinEngine(Integer stateDelay) {
         handlers.add(scheduler.scheduleAtFixedRate(
                 new EngineWorker(currentEngine),
                 0,
-                entry.getConfig().getStateDelayMs(),
+                stateDelay,
                 TimeUnit.MILLISECONDS));
     }
 

@@ -22,9 +22,9 @@ public class Engine {
 
     private List<Player> players = new ArrayList<>();
     private List<Snake> snakes = new LinkedList<>();
-    private Map<Integer, SnakesProto.Direction> moves = new HashMap<>();
+    private final Map<Integer, SnakesProto.Direction> moves = new HashMap<>();
     private List<Coord> foods = new ArrayList<>();
-    private final Player host;
+    private final Player localPlayer;
 
     @Synchronized("stateLock")
     public EngineDTO getDTO() {
@@ -53,11 +53,12 @@ public class Engine {
      * TODO::Commworker.handleJoin
      */
 
-    public Engine(GameEntry entry) {
+    public Engine(GameEntry entry, Player localPlayer) {
         this.config = entry.getConfig();
-        this.host = entry.getMaster();
-        addPlayer(entry.getMaster());
-        replenishFood();
+        this.localPlayer = localPlayer;
+        if(localPlayer.isMaster()) {
+            addPlayer(entry.getMaster());
+        }
     }
 
     public void addPlayer(Player player) {
@@ -78,7 +79,7 @@ public class Engine {
     }
 
     public void noteHostMove(SnakesProto.Direction move) {
-        notePlayerMove(host, move);
+        notePlayerMove(localPlayer, move);
     }
 
     private void notePlayerMove(Player player, SnakesProto.Direction move) {
@@ -86,7 +87,7 @@ public class Engine {
     }
 
     public void notePeerMove(Peer peer, SnakesProto.Direction move) {
-        var player = players.stream().filter(p -> peer.equals(p)).findFirst();
+        var player = players.stream().filter(peer::equals).findFirst();
         player.ifPresent(value -> notePlayerMove(value, move));
     }
 
@@ -117,9 +118,11 @@ public class Engine {
     }
 
     public void doStep() {
-        replenishFood();
-        applyMoves();
-        moveSnakes();
+        if(localPlayer.isMaster()) {
+            replenishFood();
+            applyMoves();
+            moveSnakes();
+        }
     }
 
     private void applyMoves() {
@@ -170,9 +173,7 @@ public class Engine {
             } else {
                 var player = players.stream()
                         .filter(p -> p.getId().equals(m.getSnake().getPlayerID())).findFirst();
-                if (player.isPresent()) {
-                    player.get().score();
-                }
+                player.ifPresent(Player::score);
                 removeFood(m.getCoord());
             }
 
@@ -183,7 +184,6 @@ public class Engine {
                     }
                 }, worldSize);
                 snakes.remove(m.getSnake());
-                return;
             }
         });
         replenishFood();
