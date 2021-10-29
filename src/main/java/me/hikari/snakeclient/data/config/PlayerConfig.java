@@ -4,14 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
+import me.hikari.snakes.SnakesProto;
+
+/**
+ * Config for initializing master node
+ * to start the game
+ */
 
 @Getter
 @ToString
 public class PlayerConfig {
-    public static final Integer MASTER_ID = 0;
-    public static final String MASTER_IP = "";
     private final String name;
+    public static final Integer ID = 0;
+    public static final String IP = "";
     private final Integer port;
+    public static final Integer SCORE = 0;
+    public static final SnakesProto.NodeRole ROLE = SnakesProto.NodeRole.MASTER;
 
     @JsonCreator
     public PlayerConfig(
