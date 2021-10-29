@@ -82,4 +82,8 @@ public class Player {
                 .setScore(score)
                 .build();
     }
+
+    public void become(Integer receiverID) {
+        id = receiverID;
+    }
 }

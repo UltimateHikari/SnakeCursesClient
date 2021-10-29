@@ -29,7 +29,7 @@ class ListenWorker implements Runnable{
         var buf = new byte[len];
         byteBuf.get(buf, 0, len);
         var msg = SnakesProto.GameMessage.parseFrom(buf);
-        manager.noteAnnouncement(msg.getAnnouncement(), packet.getAddress());
+        manager.noteAnnouncement(msg.getAnnouncement(), new InetSocketAddress(packet.getAddress(), packet.getPort()));
     }
 
     @SneakyThrows

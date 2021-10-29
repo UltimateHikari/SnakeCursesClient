@@ -25,7 +25,7 @@ public class CommWorker implements Runnable {
     private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
     private long msg_seq = 1;
-    private long confirmedSeq = 0;
+    private DatagramPacket joinPacket = null;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -68,18 +68,15 @@ public class CommWorker implements Runnable {
 
     @Synchronized("sendLock")
     private void handleAck(SnakesProto.GameMessage msg) {
+        // all acks matter because of join-ack
         var confirmedSeq = msg.getMsgSeq();
-        if (confirmedSeq < this.confirmedSeq) {
-            return;
-        }
-        this.confirmedSeq = confirmedSeq;
-        seqs.forEach((k, v) -> {
-            if (k < confirmedSeq) {
-                datagrams.remove(v);
+        if(seqs.containsKey(confirmedSeq)){
+            var datagram = datagrams.remove(seqs.get(confirmedSeq));
+            seqs.remove(confirmedSeq);
+            if(datagram.equals(joinPacket)){
+                manager.join(msg.getReceiverId());
             }
-        });
-        seqs = seqs.entrySet().stream().filter(e -> (e.getKey() > confirmedSeq))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
@@ -146,16 +143,18 @@ public class CommWorker implements Runnable {
     }
 
     @Synchronized("sendLock")
-    public void sendMessage(SnakesProto.GameMessage msg, String ip, Integer port) throws IOException {
+    public void sendMessage(SnakesProto.GameMessage msg, InetSocketAddress addr) throws IOException {
         msg.toBuilder().setMsgSeq(msg_seq).build();
         var msgBuf = msg.toByteArray();
         var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msgBuf.length).put(msgBuf).array();
-        var addr = new InetSocketAddress(ip, port);
         var packet = new DatagramPacket(buf, buf.length, addr);
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
         socket.send(packet);
         msg_seq++;
+        if(msg.hasJoin()){
+            joinPacket = packet;
+        }
     }
 
     @Synchronized("sendLock")

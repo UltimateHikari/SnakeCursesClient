@@ -9,6 +9,7 @@ import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -87,17 +88,30 @@ public class GameManager {
         ui.close();
     }
 
-    void startGame() {
+    void startGame() throws IOException {
         var entry = gameList.getSelectedEntry();
         localPlayer.reset();
         if (entry.getJoinAddress() != null) {
-            // TODO: send join message; wait for response; join;
+            // async wait for join
+            // (communicator will call join() on ack)
+            var joinMsg = SnakesProto.GameMessage.JoinMsg.newBuilder()
+                    .setName(localPlayer.getName())
+                    .build();
+            var msg = SnakesProto.GameMessage.newBuilder()
+                    .setJoin(joinMsg)
+                    .build();
+            communicator.sendMessage(msg, entry.getJoinAddress());
         }
         currentEngine = new Engine(entry, localPlayer);
         if (localPlayer.isMaster()) {
             spinEngine(entry.getConfig().getStateDelayMs());
             spinAnnouncer();
         }
+    }
+
+    public void join(Integer receiverID){
+        //TODO handle guys input
+        localPlayer.become(receiverID);
     }
 
     private void spinAnnouncer() {
@@ -144,7 +158,7 @@ public class GameManager {
         currentEngine.noteHostMove(dir);
     }
 
-    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg, InetAddress address) {
+    void noteAnnouncement(SnakesProto.GameMessage.AnnouncementMsg msg, InetSocketAddress address) {
         gameList.addGame(new GameEntry(msg, address));
     }
 

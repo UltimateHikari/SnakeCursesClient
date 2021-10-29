@@ -74,7 +74,6 @@ public class Engine {
     /**
      * TODO
      * update spawning algo,
-     * pass player id
      */
 
     private Snake spawnSnake(Integer id) {
@@ -118,6 +117,7 @@ public class Engine {
         for (int i = 0; i < foods.size(); i++) {
             if (f.equals(foods.get(i))) {
                 foods.remove(i);
+                return;
             }
         }
     }

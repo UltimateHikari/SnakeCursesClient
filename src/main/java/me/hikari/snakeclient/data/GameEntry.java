@@ -7,6 +7,7 @@ import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class GameEntry implements UIGameEntry {
     @Getter
     private EngineConfig config;
     @Getter
-    private InetAddress joinAddress = null;
+    private InetSocketAddress joinAddress = null;
 
     public GameEntry(Player player, EngineConfig config){
         players.add(player);
@@ -28,7 +29,7 @@ public class GameEntry implements UIGameEntry {
      * check canJoin
      */
 
-    public GameEntry(SnakesProto.GameMessage.AnnouncementMsg msg, InetAddress address){
+    public GameEntry(SnakesProto.GameMessage.AnnouncementMsg msg, InetSocketAddress address){
         joinAddress = address;
         this.config = new EngineConfig(msg.getConfig());
         for(SnakesProto.GamePlayer p : msg.getPlayers().getPlayersList()){
