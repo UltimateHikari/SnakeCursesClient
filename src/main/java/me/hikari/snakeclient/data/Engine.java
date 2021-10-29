@@ -13,6 +13,7 @@ public class Engine {
     private final static Integer PRECISION = 10000;
 
     private boolean isLatest = false;
+    //private final boolean isLocal;
     private EngineDTO dto = null;
     private final Object mapMonitor = new Object();
 
@@ -52,8 +53,8 @@ public class Engine {
 
     public Engine(GameEntry entry) {
         this.config = entry.getConfig();
-        this.host = entry.getPlayer();
-        addPlayer(entry.getPlayer());
+        this.host = entry.getMaster();
+        addPlayer(entry.getMaster());
         replenishFood();
     }
 
@@ -90,7 +91,7 @@ public class Engine {
      * update food spawn algo
      */
 
-    public void replenishFood() {
+    private void replenishFood() {
         synchronized (mapMonitor) {
             var r = new Random();
             while (foods.size() < config.getFoodStatic()) {
@@ -112,9 +113,23 @@ public class Engine {
         }
     }
 
-    public void applyMoves() {
+    public void doStep(){
+        replenishFood();
+        applyMoves();
+        moveSnakes();
+    }
+
+    private void applyMoves() {
         moves.forEach((Player p, SnakesProto.Direction d) -> snakeMap.get(p).turnHead(new Coord(d)));
         moves.clear();
+    }
+
+    public void applyState() {
+
+    }
+
+    public SnakesProto.GameMessage.StateMsg retrieveState(){
+        return null;
     }
 
     /**
@@ -123,7 +138,7 @@ public class Engine {
      * to logic from snakes.txt
      */
 
-    public void moveSnakes() {
+    private void moveSnakes() {
         synchronized (mapMonitor) {
             var list = new ArrayList<MoveResult>();
             var worldSize = config.getWorldSize();
@@ -159,6 +174,5 @@ public class Engine {
             foods.add(coord);
         }
     }
-
 
 }

@@ -77,11 +77,11 @@ class TuiUtils {
     }
 
     private static String getName(UIGameEntry e) {
-        return "Name: " + e.getPlayer().getName();
+        return "Name: " + e.getMaster().getName();
     }
 
     private static String getIP(UIGameEntry e) {
-        return "IP: " + e.getPlayer().getIp();
+        return "IP: " + e.getMaster().getIp();
     }
 
     private static String getDims(UIConfig e) {

@@ -42,7 +42,7 @@ public class Player {
         score += 1;
     }
 
-    public boolean isHost() {
+    public boolean isMaster() {
         return this.role == SnakesProto.NodeRole.MASTER;
     }
 }

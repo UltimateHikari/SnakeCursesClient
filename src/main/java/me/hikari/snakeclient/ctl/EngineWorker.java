@@ -3,24 +3,18 @@ package me.hikari.snakeclient.ctl;
 import lombok.AllArgsConstructor;
 import me.hikari.snakeclient.data.Engine;
 
+/**
+ * Worker for MASTER and DEPUTY nodes
+ * starts when host player is MASTER
+ * or elected by MASTER as DEPUTY
+ */
+
 @AllArgsConstructor
 public class EngineWorker implements Runnable {
     private Engine engine;
 
-    /**
-     * TODO
-     * add graceful exit when snakes are broken
-     */
-
     @Override
     public void run() {
-        engine.replenishFood();
-        engine.applyMoves();
-        try {
-            engine.moveSnakes();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        engine.doStep();
     }
 }

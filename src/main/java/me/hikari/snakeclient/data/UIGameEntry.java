@@ -1,6 +1,6 @@
 package me.hikari.snakeclient.data;
 
 public interface UIGameEntry {
-    Player getPlayer();
+    Player getMaster();
     UIConfig getConfig();
 }

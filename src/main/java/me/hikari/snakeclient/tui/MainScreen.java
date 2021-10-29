@@ -40,7 +40,7 @@ class MainScreen {
     }
 
     private String getConfigName(UIGameEntry c) {
-        return c.getPlayer().getName() +
+        return c.getMaster().getName() +
                 " " + TuiUtils.entryDims(c) +
                 ": " + c.getConfig().getFoodStatic();
     }

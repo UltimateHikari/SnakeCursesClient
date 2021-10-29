@@ -34,13 +34,17 @@ public class GameEntry implements UIGameEntry {
         }
     }
 
-    /**
-     * TODO
-     * refactor to getting host on tui side;
-     * left for compat reasons
-     */
-
-    public Player getPlayer(){
-        return players.get(0);
+    public Player getMaster(){
+        return players.stream().filter(Player::isMaster).findFirst().get();
     }
+
+//    /**
+//     * TODO
+//     * refactor to getting host on tui side;
+//     * left for compat reasons
+//     */
+//
+//    public Player getPlayer(){
+//        return players.get(0);
+//    }
 }
