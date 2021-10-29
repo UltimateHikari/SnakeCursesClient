@@ -43,6 +43,17 @@ public class Player {
         );
     }
 
+    public Player(Peer peer, String name, Integer id) {
+        this(
+                name,
+                id,
+                peer.getIp(),
+                peer.getPort(),
+                SnakesProto.NodeRole.NORMAL,
+                PlayerConfig.SCORE
+        );
+    }
+
     void score() {
         score += 1;
     }
@@ -51,13 +62,13 @@ public class Player {
         return this.role == SnakesProto.NodeRole.MASTER;
     }
 
-    public void reset(){
+    public void reset() {
         this.id = 0;
         this.role = SnakesProto.NodeRole.MASTER;
         this.score = 0;
     }
 
-    void changeRole(SnakesProto.NodeRole role){
+    void changeRole(SnakesProto.NodeRole role) {
         this.role = role;
     }
 

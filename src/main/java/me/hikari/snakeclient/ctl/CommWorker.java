@@ -40,35 +40,39 @@ public class CommWorker implements Runnable {
                 // normal behaviour for call of this.close();
                 return;
             }
-            var socketAddress = packet.getSocketAddress();
-            //TODO verify peer string creation
-            var peer = new Peer(packet.getAddress().toString(), packet.getPort());
             var msg = tryDeserializeMessage(packet);
-            handleMsg(msg, peer);
-            sendAck(msg, socketAddress);
+            handleMsg(msg, packet);
         }
     }
 
-    private void handleMsg(SnakesProto.GameMessage msg, Peer peer) {
+    private Peer getPeer(DatagramPacket packet){
+        return new Peer(packet.getAddress().toString(), packet.getPort());
+    }
+
+    private void handleMsg(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         switch (msg.getTypeCase()) {
-            case STEER -> handleSteer(msg, peer);
-            case STATE -> handleState(msg);
-            case JOIN -> handleJoin(msg);
+            case STEER -> handleSteer(msg, packet);
+            case STATE -> handleState(msg, packet);
+            case JOIN -> handleJoin(msg, packet);
             case ERROR -> handleError(msg);
             case ROLE_CHANGE -> handleChange(msg);
         }
     }
 
-    private void handleSteer(SnakesProto.GameMessage msg, Peer peer) {
-        manager.doSteer(msg.getSteer().getDirection(), peer);
+    private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
+        manager.doSteer(msg.getSteer().getDirection(), getPeer(packet));
+        sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
-    private void handleJoin(SnakesProto.GameMessage msg) {
-        //TODO implement
+    private void handleJoin(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
+        var receiverID = manager.joinPlayer(getPeer(packet), msg.getJoin().getName());
+        var senderID = manager.getLocalID();
+        sendAck(msg, packet.getSocketAddress(), senderID, receiverID);
     }
 
-    private void handleState(SnakesProto.GameMessage msg) {
-        //TODO implement
+    private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
+        manager.applyState(msg.getState().getState());
+        sendAck(msg, packet.getSocketAddress(), 0,0);
     }
 
     private void handleError(SnakesProto.GameMessage msg) {
@@ -79,20 +83,25 @@ public class CommWorker implements Runnable {
         //TODO implement
     }
 
-    private void sendAck(SnakesProto.GameMessage msg, SocketAddress peer) throws IOException {
-        if (!msg.getTypeCase().equals(SnakesProto.GameMessage.TypeCase.ACK)) {
-            // TODO elaborate on ids
-            var senderid = 0;
-            var receiverid = 1;
-            var answer = SnakesProto.GameMessage.newBuilder()
-                    .setMsgSeq(msg.getMsgSeq())
-                    .setAck(SnakesProto.GameMessage.AckMsg.newBuilder().build())
-                    .setReceiverId(receiverid)
-                    .setSenderId(senderid)
-                    .build().toByteArray();
-            var answerPacket = new DatagramPacket(answer, answer.length, peer);
-            socket.send(answerPacket);
+    private boolean isJoinOrChange(SnakesProto.GameMessage msg) {
+        return msg.getTypeCase().equals(SnakesProto.GameMessage.TypeCase.JOIN)
+                || msg.getTypeCase().equals(SnakesProto.GameMessage.TypeCase.ROLE_CHANGE);
+    }
+
+    private void sendAck(SnakesProto.GameMessage msg, SocketAddress peer, Integer senderID, Integer receiverID) throws IOException {
+        var answer = SnakesProto.GameMessage.newBuilder()
+                .setMsgSeq(msg.getMsgSeq())
+                .setAck(SnakesProto.GameMessage.AckMsg.newBuilder().build());
+        if (isJoinOrChange(msg)) {
+            answer.setReceiverId(receiverID)
+                    .setSenderId(senderID);
         }
+
+        var answerBuf = answer
+                .build().toByteArray();
+        var answerPacket = new DatagramPacket(answerBuf, answerBuf.length, peer);
+        socket.send(answerPacket);
+
     }
 
     private SnakesProto.GameMessage tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {

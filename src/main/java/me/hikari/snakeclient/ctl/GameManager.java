@@ -154,4 +154,16 @@ public class GameManager {
     public void actualizeGameList() {
         gameList.actualizeGames();
     }
+
+    public void applyState(SnakesProto.GameState state) {
+        currentEngine.applyState(state);
+    }
+
+    public Integer joinPlayer(Peer peer, String name) {
+        return currentEngine.joinPlayer(peer, name);
+    }
+
+    public Integer getLocalID() {
+        return localPlayer.getId();
+    }
 }

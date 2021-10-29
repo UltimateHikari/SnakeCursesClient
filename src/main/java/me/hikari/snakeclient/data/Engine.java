@@ -41,6 +41,15 @@ public class Engine {
         return dto;
     }
 
+    public Integer joinPlayer(Peer peer, String name) {
+        Integer id = players.stream()
+                .max(Comparator.comparing(Player::getId))
+                .get().getId();
+        Player newcomer = new Player(peer, name, id);
+        addPlayer(newcomer);
+        return id;
+    }
+
     @AllArgsConstructor
     private class MoveResult {
         @Getter
@@ -131,17 +140,19 @@ public class Engine {
 
     @Synchronized("stateLock")
     public void applyState(SnakesProto.GameState gameState) {
-        this.stateOrder = gameState.getStateOrder();
-        this.foods = gameState
-                .getFoodsList()
-                .stream().map(Coord::new).toList();
-        this.players = gameState
-                .getPlayers().getPlayersList()
-                .stream().map(Player::new).toList();
-        this.snakes = gameState
-                .getSnakesList()
-                .stream().map(Snake::new).toList();
-        this.config = new EngineConfig(gameState.getConfig());
+        if(gameState.getStateOrder() > stateOrder) {
+            this.stateOrder = gameState.getStateOrder();
+            this.foods = gameState
+                    .getFoodsList()
+                    .stream().map(Coord::new).toList();
+            this.players = gameState
+                    .getPlayers().getPlayersList()
+                    .stream().map(Player::new).toList();
+            this.snakes = gameState
+                    .getSnakesList()
+                    .stream().map(Snake::new).toList();
+            this.config = new EngineConfig(gameState.getConfig());
+        }
     }
 
     /**
