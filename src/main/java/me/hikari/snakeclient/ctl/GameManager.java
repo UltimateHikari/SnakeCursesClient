@@ -97,10 +97,16 @@ public class GameManager {
             var joinMsg = SnakesProto.GameMessage.JoinMsg.newBuilder()
                     .setName(localPlayer.getName())
                     .build();
+            try {
             var msg = SnakesProto.GameMessage.newBuilder()
                     .setJoin(joinMsg)
+                    .setMsgSeq(1)
                     .build();
-            communicator.sendMessage(msg, entry.getJoinAddress());
+
+                communicator.sendMessage(msg, entry.getJoinAddress());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         currentEngine = new Engine(entry, localPlayer);
         if (localPlayer.isMaster()) {
