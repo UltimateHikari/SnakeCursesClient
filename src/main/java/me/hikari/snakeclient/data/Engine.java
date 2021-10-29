@@ -32,10 +32,13 @@ public class Engine {
     @Synchronized("stateLock")
     public EngineDTO getDTO() {
         if (!isLatest) {
-            var map = new HashMap<Player, UISnake>();
-            snakeMap.forEach((p, s) -> map.put(p, new Snake(s)));
-            var foodsDto = new ArrayList<>(foods);
-            dto = new EngineDTO(map, foodsDto, config);
+            dto = new EngineDTO(
+                    stateOrder,
+                    snakes.stream().map(s -> (UISnake) new Snake(s)).toList(),
+                    players.stream().toList(),
+                    foods.stream().toList(),
+                    config
+            );
             isLatest = true;
         }
         return dto;

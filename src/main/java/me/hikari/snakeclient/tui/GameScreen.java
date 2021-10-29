@@ -9,6 +9,7 @@ import me.hikari.snakeclient.data.*;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ class GameScreen {
         var pos = grid.getFieldPos(size);
         var border = grid.getFieldSize(size);
         TuiUtils.drawFancyBoundary(tg, pos, border);
-        var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getUiConfig().getWorldSize());
+        var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getConfig().getWorldSize());
         TuiUtils.drawFancyBoundary(tg, pos, TuiUtils.addBorder(viewSize));
         tg.putString(pos, "Field");
 
@@ -55,7 +56,7 @@ class GameScreen {
         TuiUtils.putFullConfig(tg, TuiUtils.shift(pos, 0), config);
     }
 
-    private void drawScores(TextGraphics tg, Set<Player> players) {
+    private void drawScores(TextGraphics tg, List<Player> players) {
         var pos = grid.getScorePos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
@@ -83,8 +84,8 @@ class GameScreen {
         drawHeader(tg);
         drawFooter(tg);
         drawField(tg, dto);
-        drawInfo(tg, dto.getUiConfig());
-        drawScores(tg, dto.getSnakeMap().keySet());
+        drawInfo(tg, dto.getConfig());
+        drawScores(tg, dto.getPlayers());
         screen.refresh();
     }
 

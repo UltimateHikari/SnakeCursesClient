@@ -6,10 +6,8 @@ import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextImage;
-import me.hikari.snakeclient.data.Coord;
-import me.hikari.snakeclient.data.EngineDTO;
-import me.hikari.snakeclient.data.Player;
-import me.hikari.snakeclient.data.UISnake;
+import me.hikari.snakeclient.data.*;
+
 
 class LeftCorneredView implements DTO2Image {
     private TerminalSize size;
@@ -26,22 +24,34 @@ class LeftCorneredView implements DTO2Image {
         }
     }
 
-    private void putSnake(Player p, UISnake s, Coord worldSize) {
-        s.showYourself(c -> placeCharacter(coord2pos(c), 'S', brush.getColor(p)), worldSize);
+    private void putSnake(TextColor color, UISnake s, Coord worldSize) {
+        s.showYourself(c -> placeCharacter(coord2pos(c), 'S', color), worldSize);
+    }
+
+    private TextColor getColor(EngineDTO dto, UISnake s){
+        var player = dto.getPlayers()
+                .stream()
+                .filter(p -> p.getId().equals(s.getPlayerID()))
+                .findFirst();
+        if(player.isPresent()){
+            return brush.getColor(player.get());
+        }
+        return TextColor.ANSI.WHITE; // zombie color
     }
 
     @Override
     public TextImage dto2image(EngineDTO dto, TerminalSize viewSize, Brush brush) {
         size = viewSize;
         image = new BasicTextImage(viewSize);
-        var worldSize = dto.getUiConfig().getWorldSize();
+        var worldSize = dto.getConfig().getWorldSize();
         this.brush = brush;
 
         for (Coord f : dto.getFoods()) {
             // TODO::Tui
             placeCharacter(coord2pos(f), 'F', TextColor.ANSI.YELLOW_BRIGHT);
         }
-        dto.getSnakeMap().forEach((p, s) -> putSnake(p, s, worldSize));
+        // It's O(n2), but fine for low amounts player/snake
+        dto.getSnakes().forEach(s -> putSnake(getColor(dto,s), s, worldSize));
         return image;
     }
 }

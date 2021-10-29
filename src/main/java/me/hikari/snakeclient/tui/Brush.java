@@ -17,8 +17,7 @@ class Brush {
                 TextColor.ANSI.BLUE,
                 TextColor.ANSI.CYAN,
                 TextColor.ANSI.GREEN,
-                TextColor.ANSI.RED,
-                TextColor.ANSI.WHITE
+                TextColor.ANSI.RED
         ));
     }
 

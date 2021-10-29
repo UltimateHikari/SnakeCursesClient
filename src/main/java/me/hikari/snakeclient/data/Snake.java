@@ -1,6 +1,7 @@
 package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import me.hikari.snakes.SnakesProto;
 
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class Snake implements UISnake {
+    @Getter
     private Integer playerID;
     private SnakesProto.GameState.Snake.SnakeState state;
     private Coord headDirection;
