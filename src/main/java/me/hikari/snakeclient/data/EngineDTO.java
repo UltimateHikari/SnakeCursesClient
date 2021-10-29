@@ -2,11 +2,12 @@ package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.hikari.snakeclient.data.config.EngineConfig;
+import me.hikari.snakes.SnakesProto;
 
 import java.util.List;
 
 
-//TODO retrieve state constructor
 @Getter
 @AllArgsConstructor
 public class EngineDTO implements UIEngineDTO{
@@ -16,7 +17,20 @@ public class EngineDTO implements UIEngineDTO{
     private final List<Coord> foods;
     private final UIConfig config;
 
-//    public SnakesProto.GameMessage.StateMsg retrieveState(){
-//        return null;
-//    }
+    private SnakesProto.GamePlayers retrievePlayers(){
+        return SnakesProto.GamePlayers.newBuilder()
+                .addAllPlayers(players.stream().map(Player::retrieve).toList())
+                .build();
+    }
+
+    public SnakesProto.GameState retrieveState(){
+        return SnakesProto.GameState
+                .newBuilder()
+                .setStateOrder(stateOrder)
+                .addAllSnakes(snakes.stream().map(s -> ((Snake)s).retrieve()).toList())
+                .addAllFoods(foods.stream().map(Coord::retrieve).toList())
+                .setPlayers(retrievePlayers())
+                .setConfig(((EngineConfig)config).retrieve())
+                .build();
+    }
 }

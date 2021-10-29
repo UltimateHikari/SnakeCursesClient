@@ -60,4 +60,15 @@ public class Player {
     void changeRole(SnakesProto.NodeRole role){
         this.role = role;
     }
+
+    public SnakesProto.GamePlayer retrieve() {
+        return SnakesProto.GamePlayer.newBuilder()
+                .setName(name)
+                .setId(id)
+                .setIpAddress(ip)
+                .setPort(port)
+                .setRole(role)
+                .setScore(score)
+                .build();
+    }
 }

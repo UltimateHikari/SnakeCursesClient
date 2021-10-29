@@ -59,4 +59,17 @@ public class EngineConfig implements UIConfig {
                 + stateDelayMs + ", " + deadFoodProb + ", "
                 + pingDelayMs + "x" + nodeTimeoutMs + "}";
     }
+
+    public SnakesProto.GameConfig retrieve() {
+        return SnakesProto.GameConfig.newBuilder()
+                .setWidth(worldSize.getX())
+                .setHeight(worldSize.getY())
+                .setFoodStatic(foodStatic)
+                .setFoodPerPlayer(foodPerPlayer)
+                .setStateDelayMs(stateDelayMs)
+                .setDeadFoodProb(deadFoodProb)
+                .setPingDelayMs(pingDelayMs)
+                .setNodeTimeoutMs(nodeTimeoutMs)
+                .build();
+    }
 }

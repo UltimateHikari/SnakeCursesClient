@@ -69,4 +69,13 @@ public class Snake implements UISnake {
         placer.accept(pos);
     }
 
+    public SnakesProto.GameState.Snake retrieve() {
+        return SnakesProto.GameState.Snake
+                .newBuilder()
+                .setPlayerId(playerID)
+                .addAllPoints(points.stream().map(Coord::retrieve).toList())
+                .setState(state)
+                .setHeadDirection(headDirection.direction())
+                .build();
+    }
 }

@@ -56,4 +56,21 @@ public class Coord {
     public boolean equals(Coord c){
         return (c.x == this.x) && (c.y == this.y);
     }
+
+    public SnakesProto.GameState.Coord retrieve() {
+        return SnakesProto.GameState.Coord.newBuilder().setX(x).setY(y).build();
+    }
+
+    public SnakesProto.Direction direction() {
+        if(x == 0 && y == -1){
+            return SnakesProto.Direction.UP;
+        }
+        if(x == 0 && y == 1){
+            return SnakesProto.Direction.DOWN;
+        }
+        if(x == -1 && y == 0){
+            return SnakesProto.Direction.LEFT;
+        }
+        return SnakesProto.Direction.RIGHT;
+    }
 }

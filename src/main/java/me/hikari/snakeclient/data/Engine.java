@@ -49,10 +49,6 @@ public class Engine {
         private final Snake snake;
     }
 
-    /**
-     * TODO::Commworker.handleJoin
-     */
-
     public Engine(GameEntry entry, Player localPlayer) {
         this.config = entry.getConfig();
         this.localPlayer = localPlayer;
