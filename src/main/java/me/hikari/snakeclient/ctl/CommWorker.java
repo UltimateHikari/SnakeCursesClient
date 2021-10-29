@@ -2,23 +2,30 @@ package me.hikari.snakeclient.ctl;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
+import me.hikari.snakeclient.Main;
 import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommWorker implements Runnable {
+    private final Object sendLock = new Object();
+    public final static Integer RESEND_TIMEOUT_MS = 20;
     private final GameManager manager;
     private final NetConfig config;
     private final Integer port;
     private final DatagramSocket socket;
+    private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
+    private Map<Long, DatagramPacket> seqs = new HashMap<>();
     private long msg_seq = 1;
+    private long confirmedSeq = 0;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -26,7 +33,6 @@ public class CommWorker implements Runnable {
         this.port = port;
         socket = new DatagramSocket(port);
     }
-
 
     @SneakyThrows
     @Override
@@ -45,7 +51,7 @@ public class CommWorker implements Runnable {
         }
     }
 
-    private Peer getPeer(DatagramPacket packet){
+    private Peer getPeer(DatagramPacket packet) {
         return new Peer(packet.getAddress().toString(), packet.getPort());
     }
 
@@ -56,7 +62,24 @@ public class CommWorker implements Runnable {
             case JOIN -> handleJoin(msg, packet);
             case ERROR -> handleError(msg);
             case ROLE_CHANGE -> handleChange(msg);
+            case ACK -> handleAck(msg);
         }
+    }
+
+    @Synchronized("sendLock")
+    private void handleAck(SnakesProto.GameMessage msg) {
+        var confirmedSeq = msg.getMsgSeq();
+        if (confirmedSeq < this.confirmedSeq) {
+            return;
+        }
+        this.confirmedSeq = confirmedSeq;
+        seqs.forEach((k, v) -> {
+            if (k < confirmedSeq) {
+                datagrams.remove(v);
+            }
+        });
+        seqs = seqs.entrySet().stream().filter(e -> (e.getKey() > confirmedSeq))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
@@ -72,7 +95,7 @@ public class CommWorker implements Runnable {
 
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         manager.applyState(msg.getState().getState());
-        sendAck(msg, packet.getSocketAddress(), 0,0);
+        sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
     private void handleError(SnakesProto.GameMessage msg) {
@@ -120,5 +143,37 @@ public class CommWorker implements Runnable {
         var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msg.length).put(msg).array();
         var packet = new DatagramPacket(buf, buf.length, config.getGroupAddr());
         socket.send(packet);
+    }
+
+    @Synchronized("sendLock")
+    public void sendMessage(SnakesProto.GameMessage msg, String ip, Integer port) throws IOException {
+        msg.toBuilder().setMsgSeq(msg_seq).build();
+        var msgBuf = msg.toByteArray();
+        var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msgBuf.length).put(msgBuf).array();
+        var addr = new InetSocketAddress(ip, port);
+        var packet = new DatagramPacket(buf, buf.length, addr);
+        datagrams.put(packet, System.currentTimeMillis());
+        seqs.put(msg_seq, packet);
+        socket.send(packet);
+        msg_seq++;
+    }
+
+    @Synchronized("sendLock")
+    public void resend() {
+        var time = System.currentTimeMillis();
+        datagrams.forEach((k, v) -> {
+            if (time - v > RESEND_TIMEOUT_MS) {
+                try {
+                    resend(k, time);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void resend(DatagramPacket p, Long time) throws IOException {
+        socket.send(p);
+        datagrams.put(p, time);
     }
 }

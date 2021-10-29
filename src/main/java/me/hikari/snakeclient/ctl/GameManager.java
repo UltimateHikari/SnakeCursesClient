@@ -47,7 +47,12 @@ public class GameManager {
         handlers.add(scheduler.scheduleWithFixedDelay(
                 new ActualizeWorker(this),
                 0,
-                gameList.GAME_KEEP_ALIVE_MS,
+                MetaEngine.GAME_KEEP_ALIVE_MS,
+                TimeUnit.MILLISECONDS));
+        handlers.add(scheduler.scheduleWithFixedDelay(
+                new ResendWorker(communicator),
+                0,
+                CommWorker.RESEND_TIMEOUT_MS,
                 TimeUnit.MILLISECONDS));
         handlers.add(scheduler.schedule(
                 listener,
