@@ -1,10 +1,12 @@
 package me.hikari.snakeclient.data;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.hikari.snakes.SnakesProto;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Coord {
     @Getter
     private final int x;
@@ -51,10 +53,6 @@ public class Coord {
     @Override
     public String toString(){
         return "(" + x + ", " + y + ")";
-    }
-
-    public boolean equals(Coord c){
-        return (c.x == this.x) && (c.y == this.y);
     }
 
     public SnakesProto.GameState.Coord retrieve() {

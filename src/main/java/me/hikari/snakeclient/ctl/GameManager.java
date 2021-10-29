@@ -44,6 +44,11 @@ public class GameManager {
                 0,
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
+        handlers.add(scheduler.scheduleWithFixedDelay(
+                new ActualizeWorker(this),
+                0,
+                gameList.GAME_KEEP_ALIVE_MS,
+                TimeUnit.MILLISECONDS));
         handlers.add(scheduler.schedule(
                 listener,
                 0,
@@ -144,5 +149,9 @@ public class GameManager {
 
     public void doSteer(SnakesProto.Direction direction, Peer peer) {
         currentEngine.notePeerMove(peer, direction);
+    }
+
+    public void actualizeGameList() {
+        gameList.actualizeGames();
     }
 }

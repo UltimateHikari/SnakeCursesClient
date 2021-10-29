@@ -20,16 +20,18 @@ class MainScreen {
 
     private TerminalSize size;
     private UIGameEntry lastSelectedEntry = null;
+    private Integer lastListSize = 0;
 
-    private void actualizeLastSelected(UIGameEntry selectedDTO) {
-        if (!selectedDTO.equals(lastSelectedEntry)) {
-            lastSelectedEntry = selectedDTO;
+    private void actualizeLastSelected(MetaEngineDTO dto) {
+        if (!(dto.getSelectedEntry().equals(lastSelectedEntry) && lastListSize.equals(dto.getConfigs().size()))) {
+            lastSelectedEntry = dto.getSelectedEntry();
             screen.clear();
         }
     }
 
     public void show(MetaEngineDTO dto) throws IOException {
-        actualizeLastSelected(dto.getSelectedEntry());
+        actualizeLastSelected(dto);
+        lastListSize = dto.getConfigs().size();
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);

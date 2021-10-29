@@ -1,6 +1,7 @@
 package me.hikari.snakeclient.data;
 
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
@@ -9,6 +10,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode
 public class GameEntry implements UIGameEntry {
     private List<Player> players = new ArrayList<>();
     @Getter
@@ -38,13 +40,5 @@ public class GameEntry implements UIGameEntry {
         return players.stream().filter(Player::isMaster).findFirst().get();
     }
 
-//    /**
-//     * TODO
-//     * refactor to getting host on tui side;
-//     * left for compat reasons
-//     */
-//
-//    public Player getPlayer(){
-//        return players.get(0);
-//    }
+
 }

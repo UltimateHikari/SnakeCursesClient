@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MetaEngine {
-    private final static Integer GAME_KEEP_ALIVE_MS = 5000;
+    public final static Integer GAME_KEEP_ALIVE_MS = 5000;
     private final Object mapMonitor = new Object();
     private Map<GameEntry, Long> games = new HashMap<>();
 
@@ -39,6 +39,11 @@ public class MetaEngine {
         synchronized (mapMonitor) {
             // TODO check on duplicates from that player
             long time = System.currentTimeMillis();
+            for(GameEntry e : games.keySet()){
+                if(e.equals(entry)){
+                    return;
+                }
+            }
             games.put(entry, time);
             isLatest = false;
         }
