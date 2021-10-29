@@ -86,7 +86,16 @@ public class GameManager {
         currentEngine = new Engine(entry, localPlayer);
         if (localPlayer.isMaster()) {
             spinEngine(entry.getConfig().getStateDelayMs());
+            spinAnnouncer();
         }
+    }
+
+    private void spinAnnouncer() {
+        handlers.add(scheduler.scheduleAtFixedRate(
+                new AnnounceWorker(this, localPlayer, communicator),
+                0,
+                1,
+                TimeUnit.SECONDS));
     }
 
     private void spinEngine(Integer stateDelay) {

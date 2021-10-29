@@ -17,6 +17,7 @@ public class CommWorker implements Runnable {
     private final NetConfig config;
     private final Integer port;
     private final DatagramSocket socket;
+    private long msg_seq = 0;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -60,15 +61,19 @@ public class CommWorker implements Runnable {
     private void handleSteer(SnakesProto.GameMessage msg, Peer peer) {
         manager.doSteer(msg.getSteer().getDirection(), peer);
     }
+
     private void handleJoin(SnakesProto.GameMessage msg) {
         //TODO implement
     }
+
     private void handleState(SnakesProto.GameMessage msg) {
         //TODO implement
     }
+
     private void handleError(SnakesProto.GameMessage msg) {
         //TODO implement
     }
+
     private void handleChange(SnakesProto.GameMessage msg) {
         //TODO implement
     }
@@ -94,8 +99,17 @@ public class CommWorker implements Runnable {
     }
 
     public void close() {
-        if(!socket.isClosed()) {
+        if (!socket.isClosed()) {
             socket.close();
         }
+    }
+
+    public void spam(SnakesProto.GameState state) throws IOException {
+        var stateMsg = SnakesProto.GameMessage.StateMsg.newBuilder()
+                .setState(state).build();
+        var buf = SnakesProto.GameMessage.newBuilder()
+                .setState(stateMsg).setMsgSeq(msg_seq).build().toByteArray();
+        var packet = new DatagramPacket(buf, buf.length, config.getGroupAddr());
+        socket.send(packet);
     }
 }
