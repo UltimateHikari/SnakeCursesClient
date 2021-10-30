@@ -23,6 +23,7 @@ public class CommWorker implements Runnable, Communicator {
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
     private long msg_seq = 1;
     private Long joinSeq;
+    private InetSocketAddress master = null;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -52,6 +53,7 @@ public class CommWorker implements Runnable, Communicator {
     }
 
     private Peer getPeer(DatagramPacket packet) {
+        System.err.println("forming peer from " + packet.getAddress().getHostAddress());
         return new Peer(packet.getAddress().getHostAddress(), packet.getPort());
     }
 
@@ -152,8 +154,19 @@ public class CommWorker implements Runnable, Communicator {
         }
     }
 
+    @Override
+    public void sendMessageToMaster(SnakesProto.GameMessage msg) throws IOException {
+        sendMessage(msg, master);
+    }
+
+    @Override
+    public void updateMaster(InetSocketAddress addr) {
+        master = addr;
+    }
+
     @Synchronized("sendLock")
     public void resend() {
+        //TODO resend to new master
         var time = System.currentTimeMillis();
         datagrams.forEach((k, v) -> {
             if (time - v > RESEND_TIMEOUT_MS) {

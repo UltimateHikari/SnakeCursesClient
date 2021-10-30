@@ -1,36 +1,24 @@
 package me.hikari.snakeclient.ctl;
 
+import lombok.Getter;
+import lombok.Setter;
+import me.hikari.snakes.SnakesProto;
+
 enum ActiveScreen {
     MAIN,
     GAME;
 }
 
-//enum FieldState {
-//    LATEST,
-//    LAGGING;
-//}
-
 public class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;
-    //private FieldState state = FieldState.LATEST;
+    @Getter @Setter
+    public SnakesProto.NodeRole role = SnakesProto.NodeRole.VIEWER;
 
-//    public boolean isStateLagging() {
-//        return FieldState.LAGGING == state;
-//    }
-
-    public boolean isScreenMain() {
+    boolean isScreenMain() {
         return screen == ActiveScreen.MAIN;
     }
 
-//    public synchronized void switchFieldState() {
-//        if (isStateLagging()) {
-//            state = FieldState.LATEST;
-//        } else {
-//            state = FieldState.LAGGING;
-//        }
-//    }
-
-    public synchronized void switchActiveScreen() {
+    synchronized void switchActiveScreen() {
         if (isScreenMain()) {
             screen = ActiveScreen.GAME;
         } else {

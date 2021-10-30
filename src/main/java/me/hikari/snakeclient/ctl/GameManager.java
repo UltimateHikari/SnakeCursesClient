@@ -25,14 +25,15 @@ public class GameManager {
 
     private final GameConfig config;
     private Engine currentEngine = null;
-    private Player localPlayer;
-    private MetaEngine gameList;
+    private final Player localPlayer;
+    private final MetaEngine gameList;
     @Getter
     private final PluggableUI ui;
     @Getter
-    private StateSynchronizer synchronizer = new StateSynchronizer();
+    private final StateSynchronizer synchronizer = new StateSynchronizer();
     private final CommWorker communicator;
     private final ListenWorker listener;
+
 
     private void startWorkers() throws IOException {
         handlers.add(scheduler.scheduleAtFixedRate(
@@ -103,19 +104,20 @@ public class GameManager {
                     .setJoin(joinMsg)
                     .setMsgSeq(1)
                     .build();
-            communicator.sendMessage(msg, entry.getJoinAddress());
+            communicator.updateMaster(entry.getJoinAddress());
+            communicator.sendMessageToMaster(msg);
         } else {
             // local game, local as only player is already master
             spinEngine(entry.getConfig().getStateDelayMs());
             spinAnnouncer();
+            synchronizer.setRole(SnakesProto.NodeRole.MASTER);
         }
 
     }
 
     public void join(Integer receiverID) {
-        //TODO handle guys input
-        System.err.println("joined");
         localPlayer.become(receiverID);
+        synchronizer.setRole(SnakesProto.NodeRole.NORMAL);
     }
 
     private void spinAnnouncer() {
@@ -188,5 +190,9 @@ public class GameManager {
 
     public Integer getLocalID() {
         return localPlayer.getId();
+    }
+
+    public void sendSteer(SnakesProto.Direction direction) throws IOException {
+        currentEngine.sendSteer(direction);
     }
 }

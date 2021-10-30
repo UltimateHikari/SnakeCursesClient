@@ -3,6 +3,8 @@ package me.hikari.snakeclient.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+
 @Getter
 @RequiredArgsConstructor
 public class Peer {
@@ -10,6 +12,6 @@ public class Peer {
     private final Integer port;
 
     public boolean equals(Player p){
-        return this.ip == p.getIp() && this.port == p.getPort();
+        return Objects.equals(this.ip, p.getIp()) && Objects.equals(this.port, p.getPort());
     }
 }

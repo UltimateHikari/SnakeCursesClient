@@ -56,7 +56,13 @@ class InputWorker implements Runnable {
             if(state.isScreenMain()){
                 manager.navUp();
             } else {
-                manager.moveSnake(SnakesProto.Direction.UP);
+                if(state.getRole() == SnakesProto.NodeRole.MASTER) {
+                    manager.moveSnake(SnakesProto.Direction.UP);
+                    return;
+                }
+                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                    manager.sendSteer(SnakesProto.Direction.UP);
+                }
             }
         }
 
@@ -64,19 +70,37 @@ class InputWorker implements Runnable {
             if(state.isScreenMain()){
                 manager.navDown();
             } else {
-                manager.moveSnake(SnakesProto.Direction.DOWN);
+                if(state.getRole() == SnakesProto.NodeRole.MASTER) {
+                    manager.moveSnake(SnakesProto.Direction.DOWN);
+                    return;
+                }
+                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                    manager.sendSteer(SnakesProto.Direction.DOWN);
+                }
             }
         }
 
         if(c == keys.getLeft()){
             if(!state.isScreenMain()){
-                manager.moveSnake(SnakesProto.Direction.LEFT);
+                if(state.getRole() == SnakesProto.NodeRole.MASTER) {
+                    manager.moveSnake(SnakesProto.Direction.LEFT);
+                    return;
+                }
+                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                    manager.sendSteer(SnakesProto.Direction.LEFT);
+                }
             }
         }
 
         if(c == keys.getRight()){
             if(!state.isScreenMain()){
-                manager.moveSnake(SnakesProto.Direction.RIGHT);
+                if(state.getRole() == SnakesProto.NodeRole.MASTER) {
+                    manager.moveSnake(SnakesProto.Direction.RIGHT);
+                    return;
+                }
+                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                    manager.sendSteer(SnakesProto.Direction.RIGHT);
+                }
             }
         }
 

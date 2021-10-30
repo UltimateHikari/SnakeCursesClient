@@ -56,6 +56,14 @@ public class Engine {
         return id;
     }
 
+    public void sendSteer(SnakesProto.Direction direction) throws IOException {
+        var steer = SnakesProto.GameMessage.SteerMsg.newBuilder()
+                .setDirection(direction).build();
+        var msg = SnakesProto.GameMessage.newBuilder()
+                .setSteer(steer).setMsgSeq(1).build();
+        communicator.sendMessageToMaster(msg);
+    }
+
     @AllArgsConstructor
     private class MoveResult {
         @Getter
@@ -100,6 +108,7 @@ public class Engine {
 
     public void notePeerMove(Peer peer, SnakesProto.Direction move) {
         var player = players.stream().filter(peer::equals).findFirst();
+        System.err.println(player.isPresent());
         player.ifPresent(value -> notePlayerMove(value, move));
     }
 
@@ -178,6 +187,15 @@ public class Engine {
                     .getSnakesList()
                     .stream().map(Snake::new).collect(Collectors.toCollection(LinkedList<Snake>::new));
             this.config = new EngineConfig(gameState.getConfig());
+
+            // dead master state can arrive after deputy's change msg, but unlikely.
+            var masterPlayer = players.stream().filter(Player::isMaster).findFirst();
+            masterPlayer.ifPresent(player -> communicator.updateMaster(
+                    new InetSocketAddress(
+                            player.getIp(),
+                            player.getPort()
+                    )
+            ));
             this.isLatest = false;
         }
     }
