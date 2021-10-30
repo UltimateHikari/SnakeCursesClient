@@ -102,13 +102,14 @@ public class Engine {
         notePlayerMove(localPlayer, move);
     }
 
+    @Synchronized("stateLock")
     private void notePlayerMove(Player player, SnakesProto.Direction move) {
         moves.put(player.getId(), move);
     }
 
     public void notePeerMove(Peer peer, SnakesProto.Direction move) {
         var player = players.stream().filter(peer::equals).findFirst();
-        System.err.println(player.isPresent());
+        System.err.println(player.get().getId());
         player.ifPresent(value -> notePlayerMove(value, move));
     }
 
@@ -187,15 +188,6 @@ public class Engine {
                     .getSnakesList()
                     .stream().map(Snake::new).collect(Collectors.toCollection(LinkedList<Snake>::new));
             this.config = new EngineConfig(gameState.getConfig());
-
-            // dead master state can arrive after deputy's change msg, but unlikely.
-            var masterPlayer = players.stream().filter(Player::isMaster).findFirst();
-            masterPlayer.ifPresent(player -> communicator.updateMaster(
-                    new InetSocketAddress(
-                            player.getIp(),
-                            player.getPort()
-                    )
-            ));
             this.isLatest = false;
         }
     }

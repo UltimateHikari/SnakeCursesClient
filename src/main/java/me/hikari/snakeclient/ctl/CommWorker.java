@@ -94,6 +94,7 @@ public class CommWorker implements Runnable, Communicator {
 
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         manager.applyState(msg.getState().getState());
+        updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
         sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
