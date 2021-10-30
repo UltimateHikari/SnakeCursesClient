@@ -50,7 +50,7 @@ public class Engine {
     public Integer joinPlayer(Peer peer, String name) {
         Integer id = players.stream()
                 .max(Comparator.comparing(Player::getId))
-                .get().getId();
+                .get().getId() + 1;
         Player newcomer = new Player(peer, name, id);
         addPlayer(newcomer);
         return id;
