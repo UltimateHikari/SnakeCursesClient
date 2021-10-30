@@ -24,11 +24,7 @@ class ListenWorker implements Runnable{
 
     private void tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
         // SneakyThrow on failure
-        var byteBuf = ByteBuffer.wrap(packet.getData());
-        var len = byteBuf.getInt();
-        var buf = new byte[len];
-        byteBuf.get(buf, 0, len);
-        var msg = SnakesProto.GameMessage.parseFrom(buf);
+        var msg = NetUtils.tryDeserializeGameMessage(packet);
         manager.noteAnnouncement(msg.getAnnouncement(), new InetSocketAddress(packet.getAddress(), packet.getPort()));
     }
 

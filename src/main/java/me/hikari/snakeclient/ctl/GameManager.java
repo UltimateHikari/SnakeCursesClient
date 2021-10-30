@@ -94,19 +94,15 @@ public class GameManager {
         if (entry.getJoinAddress() != null) {
             // async wait for join
             // (communicator will call join() on ack)
+            localPlayer.setRole(SnakesProto.NodeRole.NORMAL);
             var joinMsg = SnakesProto.GameMessage.JoinMsg.newBuilder()
                     .setName(localPlayer.getName())
                     .build();
-            try {
             var msg = SnakesProto.GameMessage.newBuilder()
                     .setJoin(joinMsg)
                     .setMsgSeq(1)
                     .build();
-
-                communicator.sendMessage(msg, entry.getJoinAddress());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            communicator.sendMessage(msg, entry.getJoinAddress());
         }
         currentEngine = new Engine(entry, localPlayer);
         if (localPlayer.isMaster()) {
@@ -115,8 +111,9 @@ public class GameManager {
         }
     }
 
-    public void join(Integer receiverID){
+    public void join(Integer receiverID) {
         //TODO handle guys input
+        System.err.println("joined");
         localPlayer.become(receiverID);
     }
 

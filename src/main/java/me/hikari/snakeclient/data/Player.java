@@ -1,9 +1,6 @@
 package me.hikari.snakeclient.data;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import me.hikari.snakeclient.data.config.PlayerConfig;
 import me.hikari.snakes.SnakesProto;
 
@@ -17,6 +14,7 @@ public class Player {
     private Integer id;
     private final String ip;
     private final Integer port;
+    @Setter
     private SnakesProto.NodeRole role;
     @EqualsAndHashCode.Exclude
     private Integer score;
@@ -66,10 +64,6 @@ public class Player {
         this.id = 0;
         this.role = SnakesProto.NodeRole.MASTER;
         this.score = 0;
-    }
-
-    void changeRole(SnakesProto.NodeRole role) {
-        this.role = role;
     }
 
     public SnakesProto.GamePlayer retrieve() {

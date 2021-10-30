@@ -13,6 +13,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CommWorker implements Runnable {
@@ -25,7 +26,7 @@ public class CommWorker implements Runnable {
     private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
     private long msg_seq = 1;
-    private DatagramPacket joinPacket = null;
+    private Long joinSeq;
 
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
@@ -46,7 +47,7 @@ public class CommWorker implements Runnable {
                 // normal behaviour for call of this.close();
                 return;
             }
-            var msg = tryDeserializeMessage(packet);
+            var msg = NetUtils.tryDeserializeGameMessage(packet);
             handleMsg(msg, packet);
         }
     }
@@ -69,11 +70,11 @@ public class CommWorker implements Runnable {
     @Synchronized("sendLock")
     private void handleAck(SnakesProto.GameMessage msg) {
         // all acks matter because of join-ack
-        var confirmedSeq = msg.getMsgSeq();
+        Long confirmedSeq = msg.getMsgSeq();
         if(seqs.containsKey(confirmedSeq)){
-            var datagram = datagrams.remove(seqs.get(confirmedSeq));
+            datagrams.remove(seqs.get(confirmedSeq));
             seqs.remove(confirmedSeq);
-            if(datagram.equals(joinPacket)){
+            if(Objects.equals(joinSeq, confirmedSeq)){
                 manager.join(msg.getReceiverId());
             }
         }
@@ -117,15 +118,10 @@ public class CommWorker implements Runnable {
                     .setSenderId(senderID);
         }
 
-        var answerBuf = answer
-                .build().toByteArray();
-        var answerPacket = new DatagramPacket(answerBuf, answerBuf.length, peer);
+        var buf = NetUtils.serializeGameMessageBuf(answer.build().toByteArray(), config);
+        var answerPacket = new DatagramPacket(buf, buf.length, peer);
         socket.send(answerPacket);
 
-    }
-
-    private SnakesProto.GameMessage tryDeserializeMessage(DatagramPacket packet) throws InvalidProtocolBufferException {
-        return SnakesProto.GameMessage.parseFrom(packet.getData());
     }
 
     public void close() {
@@ -137,7 +133,7 @@ public class CommWorker implements Runnable {
     public void spam(SnakesProto.GameMessage.AnnouncementMsg announce) throws IOException {
         var msg = SnakesProto.GameMessage.newBuilder()
                 .setAnnouncement(announce).setMsgSeq(msg_seq).build().toByteArray();
-        var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msg.length).put(msg).array();
+        var buf = NetUtils.serializeGameMessageBuf(msg, config);
         var packet = new DatagramPacket(buf, buf.length, config.getGroupAddr());
         socket.send(packet);
     }
@@ -145,15 +141,14 @@ public class CommWorker implements Runnable {
     @Synchronized("sendLock")
     public void sendMessage(SnakesProto.GameMessage msg, InetSocketAddress addr) throws IOException {
         msg.toBuilder().setMsgSeq(msg_seq).build();
-        var msgBuf = msg.toByteArray();
-        var buf = ByteBuffer.allocate(config.getMaxMsgSize()).putInt(msgBuf.length).put(msgBuf).array();
+        var buf = NetUtils.serializeGameMessageBuf(msg.toByteArray(), config);
         var packet = new DatagramPacket(buf, buf.length, addr);
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
         socket.send(packet);
         msg_seq++;
         if(msg.hasJoin()){
-            joinPacket = packet;
+            joinSeq = msg.getMsgSeq();
         }
     }
 
