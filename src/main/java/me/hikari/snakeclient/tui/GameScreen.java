@@ -63,7 +63,7 @@ class GameScreen {
                 pos,
                 grid.getScoreSize(size));
         tg.putString(pos, "Highscores");
-
+        TuiUtils.clearRectangleByBorder(tg, pos, grid.getScoreSize(size));
         Player[] sPlayers = players.stream()
                 .sorted(Comparator.comparing(Player::getScore))
                 .toArray(size -> new Player[size]);

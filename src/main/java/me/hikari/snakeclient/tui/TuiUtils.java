@@ -109,4 +109,8 @@ class TuiUtils {
         tg.putString(pos.withRelative(0, 2), getDelay(e));
         tg.putString(pos.withRelative(0, 3), getDeadProb(e));
     }
+
+    public static void clearRectangleByBorder(TextGraphics tg, TerminalPosition pos, TerminalSize size){
+        tg.fillRectangle(shift(pos, 0), removeBorder(size), ' ');
+    }
 }
