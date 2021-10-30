@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class CommWorker implements Runnable, Communicator{
+public class CommWorker implements Runnable, Communicator {
     private final Object sendLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
     private final GameManager manager;
@@ -31,25 +31,28 @@ public class CommWorker implements Runnable, Communicator{
         socket = new DatagramSocket(port);
     }
 
-    @SneakyThrows
     @Override
     public void run() {
         var buf = new byte[config.getMaxMsgSize()];
         while (!Thread.currentThread().isInterrupted()) {
-            var packet = new DatagramPacket(buf, buf.length);
             try {
-                socket.receive(packet);
-            } catch (SocketException e) {
-                // normal behaviour for call of this.close();
-                return;
+                var packet = new DatagramPacket(buf, buf.length);
+                try {
+                    socket.receive(packet);
+                } catch (SocketException e) {
+                    // normal behaviour for call of this.close();
+                    return;
+                }
+                var msg = NetUtils.tryDeserializeGameMessage(packet);
+                handleMsg(msg, packet);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            var msg = NetUtils.tryDeserializeGameMessage(packet);
-            handleMsg(msg, packet);
         }
     }
 
     private Peer getPeer(DatagramPacket packet) {
-        return new Peer(packet.getAddress().toString(), packet.getPort());
+        return new Peer(packet.getAddress().getHostAddress(), packet.getPort());
     }
 
     private void handleMsg(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
@@ -67,10 +70,10 @@ public class CommWorker implements Runnable, Communicator{
     private void handleAck(SnakesProto.GameMessage msg) {
         // all acks matter because of join-ack
         Long confirmedSeq = msg.getMsgSeq();
-        if(seqs.containsKey(confirmedSeq)){
+        if (seqs.containsKey(confirmedSeq)) {
             datagrams.remove(seqs.get(confirmedSeq));
             seqs.remove(confirmedSeq);
-            if(Objects.equals(joinSeq, confirmedSeq)){
+            if (Objects.equals(joinSeq, confirmedSeq)) {
                 manager.join(msg.getReceiverId());
             }
         }
@@ -142,8 +145,9 @@ public class CommWorker implements Runnable, Communicator{
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
         socket.send(packet);
+        //System.err.println("sent " + msg.getTypeCase().toString() + " to " + packet.getPort());
         msg_seq++;
-        if(msg.hasJoin()){
+        if (msg.hasJoin()) {
             joinSeq = msg.getMsgSeq();
         }
     }

@@ -8,13 +8,16 @@ import lombok.SneakyThrows;
 class UIWorker implements Runnable {
     private final GameManager manager;
 
-    @SneakyThrows
     @Override
     public void run() {
-        if (manager.getSynchronizer().isScreenMain()) {
-            manager.getUi().showMainScreen(manager.getMetaDTO());
-        } else {
-            manager.getUi().showGameScreen(manager.getEngineDTO());
+        try {
+            if (manager.getSynchronizer().isScreenMain()) {
+                manager.getUi().showMainScreen(manager.getMetaDTO());
+            } else {
+                manager.getUi().showGameScreen(manager.getEngineDTO());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

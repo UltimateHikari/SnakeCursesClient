@@ -9,6 +9,7 @@ import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -107,7 +108,6 @@ public class Engine {
      * update food spawn algo
      */
 
-    @Synchronized("stateLock")
     private void replenishFood() {
         var r = new Random();
         while (foods.size() < config.getFoodStatic()) {
@@ -129,6 +129,7 @@ public class Engine {
         }
     }
 
+    @Synchronized("stateLock")
     public void doStep() throws IOException {
         if (localPlayer.isMaster()) {
             replenishFood();
@@ -149,7 +150,8 @@ public class Engine {
 
         for (Player p : players) {
             if (!localPlayer.equals(p)) {
-                communicator.sendMessage(msg, new InetSocketAddress(p.getIp(), p.getPort()));
+                var addr = new InetSocketAddress(InetAddress.getByName(p.getIp()), p.getPort());
+                communicator.sendMessage(msg, addr);
             }
         }
     }
@@ -184,7 +186,6 @@ public class Engine {
      * add score for murderer in collision
      */
 
-    @Synchronized("stateLock")
     private void moveSnakes() {
         var list = new ArrayList<MoveResult>();
         var worldSize = config.getWorldSize();
