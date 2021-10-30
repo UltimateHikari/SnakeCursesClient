@@ -35,8 +35,8 @@ public class Snake implements UISnake {
                 snake.getPlayerId(),
                 snake.getState(),
                 new Coord(snake.getHeadDirection()),
-                (LinkedList<Coord>) snake.getPointsList()
-                        .stream().map(Coord::new).collect(Collectors.toUnmodifiableList())
+                snake.getPointsList()
+                        .stream().map(Coord::new).collect(Collectors.toCollection(LinkedList<Coord>::new))
         );
     }
 

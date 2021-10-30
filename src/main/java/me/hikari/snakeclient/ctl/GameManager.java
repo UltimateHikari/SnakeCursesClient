@@ -91,6 +91,7 @@ public class GameManager {
     void startGame() throws IOException {
         var entry = gameList.getSelectedEntry();
         localPlayer.reset();
+        currentEngine = new Engine(entry, localPlayer, communicator);
         if (entry.getJoinAddress() != null) {
             // async wait for join
             // (communicator will call join() on ack)
@@ -103,12 +104,12 @@ public class GameManager {
                     .setMsgSeq(1)
                     .build();
             communicator.sendMessage(msg, entry.getJoinAddress());
-        }
-        currentEngine = new Engine(entry, localPlayer, communicator);
-        if (localPlayer.isMaster()) {
+        } else {
+            // local game, local as only player is already master
             spinEngine(entry.getConfig().getStateDelayMs());
             spinAnnouncer();
         }
+
     }
 
     public void join(Integer receiverID) {

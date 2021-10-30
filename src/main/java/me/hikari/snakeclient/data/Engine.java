@@ -176,8 +176,9 @@ public class Engine {
                     .stream().map(Player::new).toList();
             this.snakes = gameState
                     .getSnakesList()
-                    .stream().map(Snake::new).toList();
+                    .stream().map(Snake::new).collect(Collectors.toCollection(LinkedList<Snake>::new));
             this.config = new EngineConfig(gameState.getConfig());
+            this.isLatest = false;
         }
     }
 

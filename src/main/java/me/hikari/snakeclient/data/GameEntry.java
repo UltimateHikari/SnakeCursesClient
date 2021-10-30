@@ -38,7 +38,11 @@ public class GameEntry implements UIGameEntry {
     }
 
     public Player getMaster(){
-        return players.stream().filter(Player::isMaster).findFirst().get();
+        var master = players.stream().filter(Player::isMaster).findFirst();
+        return master.orElseGet(() -> players.get(0));
+        // Workaround for local-game entry mechanism:
+        // localPlayer is master of local entries,
+        // but in process of join he becomes normal
     }
 
 
