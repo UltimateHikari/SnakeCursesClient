@@ -104,7 +104,7 @@ public class GameManager {
                     .build();
             communicator.sendMessage(msg, entry.getJoinAddress());
         }
-        currentEngine = new Engine(entry, localPlayer);
+        currentEngine = new Engine(entry, localPlayer, communicator);
         if (localPlayer.isMaster()) {
             spinEngine(entry.getConfig().getStateDelayMs());
             spinAnnouncer();

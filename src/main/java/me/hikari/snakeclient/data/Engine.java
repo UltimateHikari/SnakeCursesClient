@@ -3,9 +3,13 @@ package me.hikari.snakeclient.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Synchronized;
+import me.hikari.snakeclient.ctl.CommWorker;
+import me.hikari.snakeclient.ctl.Communicator;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -25,6 +29,7 @@ public class Engine {
     private final Map<Integer, SnakesProto.Direction> moves = new HashMap<>();
     private List<Coord> foods = new ArrayList<>();
     private final Player localPlayer;
+    private final Communicator communicator;
 
     @Synchronized("stateLock")
     public EngineDTO getDTO() {
@@ -58,14 +63,16 @@ public class Engine {
         private final Snake snake;
     }
 
-    public Engine(GameEntry entry, Player localPlayer) {
+    public Engine(GameEntry entry, Player localPlayer, Communicator communicator) {
         this.config = entry.getConfig();
         this.localPlayer = localPlayer;
-        if(localPlayer.isMaster()) {
+        this.communicator = communicator;
+        if (localPlayer.isMaster()) {
             addPlayer(entry.getMaster());
         }
     }
 
+    @Synchronized("stateLock")
     public void addPlayer(Player player) {
         this.snakes.add(spawnSnake(player.getId()));
         this.players.add(player);
@@ -122,11 +129,28 @@ public class Engine {
         }
     }
 
-    public void doStep() {
-        if(localPlayer.isMaster()) {
+    public void doStep() throws IOException {
+        if (localPlayer.isMaster()) {
             replenishFood();
             applyMoves();
             moveSnakes();
+            propagateState();
+        }
+    }
+
+    private void propagateState() throws IOException {
+        var msg = SnakesProto.GameMessage
+                .newBuilder()
+                .setState(
+                        getDTO().retrieveState()
+                )
+                .setMsgSeq(1)
+                .build();
+
+        for (Player p : players) {
+            if (!localPlayer.equals(p)) {
+                communicator.sendMessage(msg, new InetSocketAddress(p.getIp(), p.getPort()));
+            }
         }
     }
 
@@ -140,7 +164,7 @@ public class Engine {
 
     @Synchronized("stateLock")
     public void applyState(SnakesProto.GameState gameState) {
-        if(gameState.getStateOrder() > stateOrder) {
+        if (gameState.getStateOrder() > stateOrder) {
             this.stateOrder = gameState.getStateOrder();
             this.foods = gameState
                     .getFoodsList()

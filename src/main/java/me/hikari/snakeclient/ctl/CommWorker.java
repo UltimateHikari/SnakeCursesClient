@@ -1,22 +1,18 @@
 package me.hikari.snakeclient.ctl;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
-import me.hikari.snakeclient.Main;
 import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class CommWorker implements Runnable {
+public class CommWorker implements Runnable, Communicator{
     private final Object sendLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
     private final GameManager manager;
