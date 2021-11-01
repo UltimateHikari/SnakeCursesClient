@@ -2,6 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 import lombok.SneakyThrows;
 import lombok.Synchronized;
+import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Log4j2
 public class CommWorker implements Runnable, Communicator {
     private final Object sendLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
@@ -148,6 +150,7 @@ public class CommWorker implements Runnable, Communicator {
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
         socket.send(packet);
+        log.info(msg.getTypeCase());
         //System.err.println("sent " + msg.getTypeCase().toString() + " to " + packet.getPort());
         msg_seq++;
         if (msg.hasJoin()) {

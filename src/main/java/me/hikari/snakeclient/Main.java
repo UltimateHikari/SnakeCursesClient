@@ -3,6 +3,7 @@ package me.hikari.snakeclient;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.ctl.GameManager;
 import me.hikari.snakeclient.data.config.GameConfig;
 import me.hikari.snakeclient.tui.Tui;
@@ -10,6 +11,7 @@ import me.hikari.snakeclient.tui.Tui;
 import java.io.File;
 import java.io.IOException;
 
+@Log4j2
 public class Main {
     private static String configName = "./src/main/resources/config.yaml";
 
@@ -21,7 +23,7 @@ public class Main {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
         mapper.findAndRegisterModules();
         var config = mapper.readValue(new File(configName), GameConfig.class);
-        System.out.println(config);
+        log.info(config);
         return config;
     }
 
