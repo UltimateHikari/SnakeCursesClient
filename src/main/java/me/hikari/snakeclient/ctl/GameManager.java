@@ -16,6 +16,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TODO: mechanism for checking master health
+ * if we are deputy
+ */
+
 class GameManager implements InputDelegate, MessageDelegate{
     private static final int UI_REFRESH_RATE_MS = 10;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
@@ -97,7 +102,7 @@ class GameManager implements InputDelegate, MessageDelegate{
         if (entry.getJoinAddress() != null) {
             // async wait for join
             // (communicator will call join() on ack)
-            localPlayer.setRole(SnakesProto.NodeRole.NORMAL);
+            currentEngine.setSelfRole(SnakesProto.NodeRole.NORMAL);
             var joinMsg = SnakesProto.GameMessage.JoinMsg.newBuilder()
                     .setName(localPlayer.getName())
                     .build();
@@ -148,19 +153,23 @@ class GameManager implements InputDelegate, MessageDelegate{
         throw new IllegalStateException("No game is active");
     }
 
+    @Override
     public void joinAsNormal(Integer receiverID) {
         localPlayer.become(receiverID);
         synchronizer.setRole(SnakesProto.NodeRole.NORMAL);
     }
 
+    @Override
     public void noteNavDown() {
         gameList.navDown();
     }
 
+    @Override
     public void noteNavUp() {
         gameList.navUp();
     }
 
+    @Override
     public void noteSnakeMove(SnakesProto.Direction dir) {
         currentEngine.noteHostMove(dir);
     }
@@ -178,6 +187,7 @@ class GameManager implements InputDelegate, MessageDelegate{
         return localPlayer.getId();
     }
 
+    @Override
     public void sendSteer(SnakesProto.Direction direction) throws IOException {
         currentEngine.sendSteer(direction);
     }
@@ -200,6 +210,23 @@ class GameManager implements InputDelegate, MessageDelegate{
     @Override
     public void handleErrorMsg(String errorMessage) {
         currentEngine.noteError(errorMessage);
+    }
+
+    @Override
+    public void handleExitChange(Peer peer) {
+        currentEngine.exilePlayer(peer);
+    }
+
+    @Override
+    public void handleReceiverRoleChange(SnakesProto.NodeRole role) {
+        synchronizer.setRole(role);
+        if(role == SnakesProto.NodeRole.MASTER || role == SnakesProto.NodeRole.DEPUTY){
+            // idling when deputy for faster start at master death
+            spinEngine(config.getEngineConfig().getStateDelayMs());
+            spinAnnouncer();
+        }
+        // for sync with rest of engine
+        currentEngine.setSelfRole(role);
     }
 
     @Override

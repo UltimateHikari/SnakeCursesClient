@@ -15,4 +15,8 @@ interface MessageDelegate {
     void handleStateMsg(SnakesProto.GameState state);
 
     void handleErrorMsg(String errorMessage);
+
+    void handleExitChange(Peer peer);
+
+    void handleReceiverRoleChange(SnakesProto.NodeRole role);
 }

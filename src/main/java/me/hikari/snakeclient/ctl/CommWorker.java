@@ -62,7 +62,7 @@ class CommWorker implements Runnable, Communicator {
             case STATE -> handleState(msg, packet);
             case JOIN -> handleJoin(msg, packet);
             case ERROR -> handleError(msg);
-            case ROLE_CHANGE -> handleChange(msg);
+            case ROLE_CHANGE -> handleChange(msg, packet);
             case ACK -> handleAck(msg);
         }
     }
@@ -93,7 +93,7 @@ class CommWorker implements Runnable, Communicator {
 
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         manager.handleStateMsg(msg.getState().getState());
-        updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
+        updateMaster(packet);
         sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
@@ -101,8 +101,16 @@ class CommWorker implements Runnable, Communicator {
         manager.handleErrorMsg(msg.getError().getErrorMessage());
     }
 
-    private void handleChange(SnakesProto.GameMessage msg) {
-        //TODO implement
+    private void handleChange(SnakesProto.GameMessage msg, DatagramPacket packet) {
+        if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.MASTER){
+            updateMaster(packet);
+        }
+
+        if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER){
+            manager.handleExitChange(getPeer(packet));
+        }
+
+        manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());
     }
 
     private boolean isJoinOrChange(SnakesProto.GameMessage msg) {
@@ -161,6 +169,10 @@ class CommWorker implements Runnable, Communicator {
     @Override
     public void sendMessageToMaster(SnakesProto.GameMessage msg) throws IOException {
         sendMessage(msg, master);
+    }
+
+    private void updateMaster(DatagramPacket packet) {
+        updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
     }
 
     @Override

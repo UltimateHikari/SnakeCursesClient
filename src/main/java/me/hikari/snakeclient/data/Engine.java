@@ -71,6 +71,16 @@ public class Engine {
         isLatest = false;
     }
 
+    public void exilePlayer(Peer peer) {
+        var player = players.stream().filter(peer::equals).findFirst();
+        player.ifPresent(value -> value.setRole(SnakesProto.NodeRole.VIEWER));
+    }
+
+    @Synchronized("stateLock")
+    public void setSelfRole(SnakesProto.NodeRole role) {
+        localPlayer.setRole(role);
+    }
+
     @AllArgsConstructor
     private class MoveResult {
         @Getter
@@ -116,7 +126,6 @@ public class Engine {
 
     public void notePeerMove(Peer peer, SnakesProto.Direction move) {
         var player = players.stream().filter(peer::equals).findFirst();
-        System.err.println(player.get().getId());
         player.ifPresent(value -> notePlayerMove(value, move));
     }
 
