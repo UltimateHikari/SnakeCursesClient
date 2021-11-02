@@ -3,7 +3,6 @@ package me.hikari.snakeclient.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Synchronized;
-import me.hikari.snakeclient.ctl.CommWorker;
 import me.hikari.snakeclient.ctl.Communicator;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
@@ -42,7 +41,7 @@ public class Engine {
                     players.stream().toList(),
                     foods.stream().toList(),
                     config,
-                    new String(error)
+                    error
             );
             isLatest = true;
         }

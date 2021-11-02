@@ -3,11 +3,12 @@ package me.hikari.snakeclient.ctl;
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.SneakyThrows;
 import me.hikari.snakeclient.data.config.NetConfig;
-import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.*;
-import java.nio.ByteBuffer;
+import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
 
 class ListenWorker implements Runnable{
     private static final int MAX_MESSAGE_SIZE = 1000;

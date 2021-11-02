@@ -7,13 +7,13 @@ import me.hikari.snakes.SnakesProto;
 import java.io.IOException;
 
 class InputWorker implements Runnable {
-    private final GameManager manager;
+    private final InputDelegate manager;
     private final StateSynchronizer state;
     private final KeyConfig keys;
 
-    public InputWorker(GameManager manager){
+    public InputWorker(InputDelegate manager, KeyConfig keys){
         this.manager = manager;
-        this.keys = manager.getKeyconfig();
+        this.keys = keys;
         state = manager.getSynchronizer();
     }
 
@@ -21,7 +21,7 @@ class InputWorker implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                KeyStroke stroke = manager.getUi().getInput();
+                KeyStroke stroke = manager.getInput();
                 tryHandleStroke(stroke);
                 //System.err.println(stroke.getCharacter() + " " + stroke.getEventTime());
             } catch (IOException e) {
@@ -54,10 +54,10 @@ class InputWorker implements Runnable {
 
         if(c == keys.getUp()){
             if(state.isScreenMain()){
-                manager.navUp();
+                manager.noteNavUp();
             } else {
                 if(state.getRole() == SnakesProto.NodeRole.MASTER) {
-                    manager.moveSnake(SnakesProto.Direction.UP);
+                    manager.noteSnakeMove(SnakesProto.Direction.UP);
                     return;
                 }
                 if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
@@ -68,10 +68,10 @@ class InputWorker implements Runnable {
 
         if(c == keys.getDown()){
             if(state.isScreenMain()){
-                manager.navDown();
+                manager.noteNavDown();
             } else {
                 if(state.getRole() == SnakesProto.NodeRole.MASTER) {
-                    manager.moveSnake(SnakesProto.Direction.DOWN);
+                    manager.noteSnakeMove(SnakesProto.Direction.DOWN);
                     return;
                 }
                 if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
@@ -83,7 +83,7 @@ class InputWorker implements Runnable {
         if(c == keys.getLeft()){
             if(!state.isScreenMain()){
                 if(state.getRole() == SnakesProto.NodeRole.MASTER) {
-                    manager.moveSnake(SnakesProto.Direction.LEFT);
+                    manager.noteSnakeMove(SnakesProto.Direction.LEFT);
                     return;
                 }
                 if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
@@ -95,7 +95,7 @@ class InputWorker implements Runnable {
         if(c == keys.getRight()){
             if(!state.isScreenMain()){
                 if(state.getRole() == SnakesProto.NodeRole.MASTER) {
-                    manager.moveSnake(SnakesProto.Direction.RIGHT);
+                    manager.noteSnakeMove(SnakesProto.Direction.RIGHT);
                     return;
                 }
                 if(state.getRole() == SnakesProto.NodeRole.NORMAL) {

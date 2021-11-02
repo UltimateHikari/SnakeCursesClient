@@ -7,7 +7,7 @@ import me.hikari.snakes.SnakesProto;
 import java.net.DatagramPacket;
 import java.nio.ByteBuffer;
 
-public class NetUtils {
+class NetUtils {
 
     public static SnakesProto.GameMessage tryDeserializeGameMessage(
             DatagramPacket packet

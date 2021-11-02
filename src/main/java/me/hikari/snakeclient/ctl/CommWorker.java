@@ -1,6 +1,5 @@
 package me.hikari.snakeclient.ctl;
 
-import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.data.Peer;
@@ -14,10 +13,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @Log4j2
-public class CommWorker implements Runnable, Communicator {
+class CommWorker implements Runnable, Communicator {
     private final Object sendLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
-    private final GameManager manager;
+    private final MessageDelegate manager;
     private final NetConfig config;
     private final DatagramSocket socket;
     private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
@@ -26,7 +25,7 @@ public class CommWorker implements Runnable, Communicator {
     private Long joinSeq;
     private InetSocketAddress master = null;
 
-    public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
+    public CommWorker(MessageDelegate gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
         this.config = netConfig;
         socket = new DatagramSocket(port);
@@ -75,31 +74,31 @@ public class CommWorker implements Runnable, Communicator {
         if (seqs.containsKey(confirmedSeq)) {
             datagrams.remove(seqs.remove(confirmedSeq));
             if (Objects.equals(joinSeq, confirmedSeq)) {
-                manager.join(msg.getReceiverId());
+                manager.joinAsNormal(msg.getReceiverId());
             }
         }
         log.debug(confirmedSeq + ":" + seqs);
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        manager.doSteer(msg.getSteer().getDirection(), getPeer(packet));
+        manager.handleSteerMsg(msg.getSteer().getDirection(), getPeer(packet));
         sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
     private void handleJoin(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        var receiverID = manager.joinPlayer(getPeer(packet), msg.getJoin().getName());
+        var receiverID = manager.handleJoinMsg(getPeer(packet), msg.getJoin().getName());
         var senderID = manager.getLocalID();
         sendAck(msg, packet.getSocketAddress(), senderID, receiverID);
     }
 
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        manager.applyState(msg.getState().getState());
+        manager.handleStateMsg(msg.getState().getState());
         updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
         sendAck(msg, packet.getSocketAddress(), 0, 0);
     }
 
     private void handleError(SnakesProto.GameMessage msg) {
-        manager.handleError(msg.getError().getErrorMessage());
+        manager.handleErrorMsg(msg.getError().getErrorMessage());
     }
 
     private void handleChange(SnakesProto.GameMessage msg) {

@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 
 @AllArgsConstructor
-public class EngineWorker implements Runnable {
+class EngineWorker implements Runnable {
     private Engine engine;
 
     @Override

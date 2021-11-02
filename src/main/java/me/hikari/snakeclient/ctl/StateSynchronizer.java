@@ -9,7 +9,7 @@ enum ActiveScreen {
     GAME;
 }
 
-public class StateSynchronizer {
+class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;
     @Getter @Setter
     private SnakesProto.NodeRole role = SnakesProto.NodeRole.VIEWER;

@@ -1,9 +1,9 @@
 package me.hikari.snakeclient.data;
 
-import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.config.EngineConfig;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MetaEngine {

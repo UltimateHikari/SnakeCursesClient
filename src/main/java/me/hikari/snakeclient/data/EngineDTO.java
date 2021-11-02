@@ -1,6 +1,5 @@
 package me.hikari.snakeclient.data;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;

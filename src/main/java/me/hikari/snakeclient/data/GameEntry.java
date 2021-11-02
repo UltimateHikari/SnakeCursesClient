@@ -6,7 +6,6 @@ import lombok.Getter;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;

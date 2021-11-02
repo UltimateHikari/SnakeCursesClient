@@ -1,10 +1,11 @@
 package me.hikari.snakeclient.data;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import me.hikari.snakeclient.data.config.PlayerConfig;
 import me.hikari.snakes.SnakesProto;
-
-import java.util.Objects;
 
 @AllArgsConstructor
 @Getter

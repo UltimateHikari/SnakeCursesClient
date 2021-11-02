@@ -1,14 +1,13 @@
 package me.hikari.snakeclient.ctl;
 
+import com.googlecode.lanterna.input.KeyStroke;
 import lombok.Getter;
 import me.hikari.snakeclient.data.*;
 import me.hikari.snakeclient.data.config.GameConfig;
-import me.hikari.snakeclient.data.config.KeyConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class GameManager {
+class GameManager implements InputDelegate, MessageDelegate{
     private static final int UI_REFRESH_RATE_MS = 10;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
     private ScheduledFuture<?> currentGame = null;
@@ -35,14 +34,14 @@ public class GameManager {
     private final ListenWorker listener;
 
 
-    private void startWorkers() throws IOException {
+    private void startWorkers() {
         handlers.add(scheduler.scheduleAtFixedRate(
                 new UIWorker(this),
                 0,
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
         handlers.add(scheduler.scheduleWithFixedDelay(
-                new InputWorker(this),
+                new InputWorker(this, config.getKeyConfig()),
                 0,
                 UI_REFRESH_RATE_MS,
                 TimeUnit.MILLISECONDS));
@@ -81,6 +80,7 @@ public class GameManager {
         communicator.run();
     }
 
+    @Override
     public void close() throws IOException {
         handlers.forEach(h -> h.cancel(true));
         listener.close();
@@ -89,7 +89,8 @@ public class GameManager {
         ui.close();
     }
 
-    void startGame() throws IOException {
+    @Override
+    public void startGame() throws IOException {
         var entry = gameList.getSelectedEntry();
         localPlayer.reset();
         currentEngine = new Engine(entry, localPlayer, communicator);
@@ -114,9 +115,10 @@ public class GameManager {
 
     }
 
-    public void join(Integer receiverID) {
-        localPlayer.become(receiverID);
-        synchronizer.setRole(SnakesProto.NodeRole.NORMAL);
+    @Override
+    public void stopGame() {
+        currentGame.cancel(true);
+        currentEngine = null;
     }
 
     private void spinAnnouncer() {
@@ -135,11 +137,6 @@ public class GameManager {
                 TimeUnit.MILLISECONDS));
     }
 
-    void stopGame() {
-        currentGame.cancel(true);
-        currentEngine = null;
-    }
-
     MetaEngineDTO getMetaDTO() {
         return gameList.getDTO();
     }
@@ -151,15 +148,20 @@ public class GameManager {
         throw new IllegalStateException("No game is active");
     }
 
-    void navDown() {
+    public void joinAsNormal(Integer receiverID) {
+        localPlayer.become(receiverID);
+        synchronizer.setRole(SnakesProto.NodeRole.NORMAL);
+    }
+
+    public void noteNavDown() {
         gameList.navDown();
     }
 
-    void navUp() {
+    public void noteNavUp() {
         gameList.navUp();
     }
 
-    void moveSnake(SnakesProto.Direction dir) {
+    public void noteSnakeMove(SnakesProto.Direction dir) {
         currentEngine.noteHostMove(dir);
     }
 
@@ -167,26 +169,11 @@ public class GameManager {
         gameList.addGame(new GameEntry(msg, address));
     }
 
-    public KeyConfig getKeyconfig() {
-        return config.getKeyConfig();
-    }
-
-    public void doSteer(SnakesProto.Direction direction, Peer peer) {
-        currentEngine.notePeerMove(peer, direction);
-    }
-
     public void actualizeGameList() {
         gameList.actualizeGames();
     }
 
-    public void applyState(SnakesProto.GameState state) {
-        currentEngine.applyState(state);
-    }
-
-    public Integer joinPlayer(Peer peer, String name) {
-        return currentEngine.joinPlayer(peer, name);
-    }
-
+    @Override
     public Integer getLocalID() {
         return localPlayer.getId();
     }
@@ -195,7 +182,28 @@ public class GameManager {
         currentEngine.sendSteer(direction);
     }
 
-    public void handleError(String errorMessage) {
+    @Override
+    public void handleStateMsg(SnakesProto.GameState state) {
+        currentEngine.applyState(state);
+    }
+
+    @Override
+    public void handleSteerMsg(SnakesProto.Direction direction, Peer peer) {
+        currentEngine.notePeerMove(peer, direction);
+    }
+
+    @Override
+    public Integer handleJoinMsg(Peer peer, String name) {
+        return currentEngine.joinPlayer(peer, name);
+    }
+
+    @Override
+    public void handleErrorMsg(String errorMessage) {
         currentEngine.noteError(errorMessage);
+    }
+
+    @Override
+    public KeyStroke getInput() throws IOException {
+        return ui.getInput();
     }
 }

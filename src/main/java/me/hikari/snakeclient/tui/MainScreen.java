@@ -6,7 +6,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.Main;
 import me.hikari.snakeclient.data.MetaEngineDTO;
 import me.hikari.snakeclient.data.UIGameEntry;
 

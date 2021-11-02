@@ -2,7 +2,6 @@ package me.hikari.snakeclient.ctl;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 @RequiredArgsConstructor
 class UIWorker implements Runnable {

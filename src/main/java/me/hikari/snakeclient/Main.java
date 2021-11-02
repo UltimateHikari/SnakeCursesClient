@@ -1,10 +1,10 @@
 package me.hikari.snakeclient;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import lombok.extern.log4j.Log4j2;
-import me.hikari.snakeclient.ctl.GameManager;
+import me.hikari.snakeclient.ctl.Game;
 import me.hikari.snakeclient.data.config.GameConfig;
 import me.hikari.snakeclient.tui.Tui;
 
@@ -33,7 +33,7 @@ public class Main {
         }
         var config = parseConfig();
         Tui tui = new Tui(config.getKeyConfig());
-        GameManager manager = new GameManager(tui, config);
-        manager.start();
+        Game game = new Game(tui, config);
+        game.start();
     }
 }

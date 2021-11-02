@@ -6,7 +6,9 @@ import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextImage;
-import me.hikari.snakeclient.data.*;
+import me.hikari.snakeclient.data.Coord;
+import me.hikari.snakeclient.data.EngineDTO;
+import me.hikari.snakeclient.data.UISnake;
 
 
 class LeftCorneredView implements DTO2Image {
