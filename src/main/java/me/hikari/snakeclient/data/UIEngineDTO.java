@@ -7,4 +7,5 @@ public interface UIEngineDTO {
     List<UISnake> getSnakes();
     List<Player> getPlayers();
     List<Coord> getFoods();
+    String getError();
 }

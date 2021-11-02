@@ -194,4 +194,8 @@ public class GameManager {
     public void sendSteer(SnakesProto.Direction direction) throws IOException {
         currentEngine.sendSteer(direction);
     }
+
+    public void handleError(String errorMessage) {
+        currentEngine.noteError(errorMessage);
+    }
 }

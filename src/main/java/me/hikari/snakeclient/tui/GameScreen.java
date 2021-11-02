@@ -82,19 +82,23 @@ class GameScreen {
         size = TuiUtils.refreshDims(screen);
         TextGraphics tg = screen.newTextGraphics();
         drawHeader(tg);
-        drawFooter(tg);
+        drawFooter(tg, dto.getError());
         drawField(tg, dto);
         drawInfo(tg, dto.getConfig());
         drawScores(tg, dto.getPlayers());
         screen.refresh();
     }
 
-    private void drawFooter(TextGraphics tg) {
+    private void drawFooter(TextGraphics tg, String error) {
         var pos = grid.getFooterPos(size);
         TuiUtils.drawFancyBoundary(
                 tg,
                 pos,
                 grid.getFooterSize(size));
-        tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
+        if (error != null) {
+            tg.putString(TuiUtils.center(pos, size, error.length()), error);
+        } else {
+            tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
+        }
     }
 }

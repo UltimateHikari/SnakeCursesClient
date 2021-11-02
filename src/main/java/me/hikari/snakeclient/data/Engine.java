@@ -31,6 +31,7 @@ public class Engine {
     private List<Coord> foods = new ArrayList<>();
     private final Player localPlayer;
     private final Communicator communicator;
+    private String error = null;
 
     @Synchronized("stateLock")
     public EngineDTO getDTO() {
@@ -40,7 +41,8 @@ public class Engine {
                     snakes.stream().map(s -> (UISnake) new Snake(s)).toList(),
                     players.stream().toList(),
                     foods.stream().toList(),
-                    config
+                    config,
+                    new String(error)
             );
             isLatest = true;
         }
@@ -62,6 +64,12 @@ public class Engine {
         var msg = SnakesProto.GameMessage.newBuilder()
                 .setSteer(steer).buildPartial();
         communicator.sendMessageToMaster(msg);
+    }
+
+    @Synchronized("stateLock")
+    public void noteError(String errorMessage) {
+        this.error = errorMessage;
+        isLatest = false;
     }
 
     @AllArgsConstructor

@@ -99,7 +99,7 @@ public class CommWorker implements Runnable, Communicator {
     }
 
     private void handleError(SnakesProto.GameMessage msg) {
-        //TODO implement
+        manager.handleError(msg.getError().getErrorMessage());
     }
 
     private void handleChange(SnakesProto.GameMessage msg) {

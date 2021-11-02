@@ -17,6 +17,7 @@ public class EngineDTO implements UIEngineDTO{
     private final List<Player> players;
     private final List<Coord> foods;
     private final UIConfig config;
+    private final String error;
 
     private SnakesProto.GamePlayers retrievePlayers(){
         return SnakesProto.GamePlayers.newBuilder()
