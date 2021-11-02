@@ -18,5 +18,5 @@ interface MessageDelegate {
 
     void handleExitChange(Peer peer);
 
-    void handleReceiverRoleChange(SnakesProto.NodeRole role);
+    Integer handleReceiverRoleChange(SnakesProto.NodeRole role);
 }

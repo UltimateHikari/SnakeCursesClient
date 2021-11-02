@@ -101,7 +101,7 @@ class CommWorker implements Runnable, Communicator {
         manager.handleErrorMsg(msg.getError().getErrorMessage());
     }
 
-    private void handleChange(SnakesProto.GameMessage msg, DatagramPacket packet) {
+    private void handleChange(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.MASTER){
             updateMaster(packet);
         }
@@ -109,8 +109,9 @@ class CommWorker implements Runnable, Communicator {
         if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER){
             manager.handleExitChange(getPeer(packet));
         }
-
-        manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());
+        // TODO clarify with ids; mb method for peer -> id
+        var receiverID = manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());
+        sendAck(msg, packet.getSocketAddress(), manager.getLocalID(), receiverID);
     }
 
     private boolean isJoinOrChange(SnakesProto.GameMessage msg) {
