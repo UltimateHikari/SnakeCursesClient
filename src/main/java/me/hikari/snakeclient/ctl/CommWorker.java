@@ -19,7 +19,6 @@ public class CommWorker implements Runnable, Communicator {
     public final static Integer RESEND_TIMEOUT_MS = 20;
     private final GameManager manager;
     private final NetConfig config;
-    private final Integer port;
     private final DatagramSocket socket;
     private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
@@ -30,7 +29,6 @@ public class CommWorker implements Runnable, Communicator {
     public CommWorker(GameManager gameManager, NetConfig netConfig, Integer port) throws IOException {
         this.manager = gameManager;
         this.config = netConfig;
-        this.port = port;
         socket = new DatagramSocket(port);
     }
 
@@ -81,6 +79,7 @@ public class CommWorker implements Runnable, Communicator {
                 manager.join(msg.getReceiverId());
             }
         }
+        log.info(confirmedSeq + ":" + seqs);
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
@@ -125,6 +124,7 @@ public class CommWorker implements Runnable, Communicator {
         var buf = NetUtils.serializeGameMessageBuf(answer.build().toByteArray(), config);
         var answerPacket = new DatagramPacket(buf, buf.length, peer);
         socket.send(answerPacket);
+        log.info(answerPacket.getPort() + " " + answer);
 
     }
 
@@ -150,8 +150,7 @@ public class CommWorker implements Runnable, Communicator {
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
         socket.send(packet);
-        log.info(msg.getTypeCase());
-        //System.err.println("sent " + msg.getTypeCase().toString() + " to " + packet.getPort());
+        log.info(msg.getTypeCase().toString());
         msg_seq++;
         if (msg.hasJoin()) {
             joinSeq = msg.getMsgSeq();
@@ -183,7 +182,7 @@ public class CommWorker implements Runnable, Communicator {
         });
     }
 
-    public void resend(DatagramPacket p, Long time) throws IOException {
+    private void resend(DatagramPacket p, Long time) throws IOException {
         socket.send(p);
         datagrams.put(p, time);
     }
