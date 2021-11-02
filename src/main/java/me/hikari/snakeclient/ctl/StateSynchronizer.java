@@ -12,7 +12,7 @@ enum ActiveScreen {
 public class StateSynchronizer {
     private ActiveScreen screen = ActiveScreen.MAIN;
     @Getter @Setter
-    public SnakesProto.NodeRole role = SnakesProto.NodeRole.VIEWER;
+    private SnakesProto.NodeRole role = SnakesProto.NodeRole.VIEWER;
 
     boolean isScreenMain() {
         return screen == ActiveScreen.MAIN;

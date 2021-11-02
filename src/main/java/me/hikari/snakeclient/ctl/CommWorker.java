@@ -78,7 +78,7 @@ public class CommWorker implements Runnable, Communicator {
                 manager.join(msg.getReceiverId());
             }
         }
-        log.info(confirmedSeq + ":" + seqs);
+        log.debug(confirmedSeq + ":" + seqs);
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
@@ -147,14 +147,16 @@ public class CommWorker implements Runnable, Communicator {
         SnakesProto.GameMessage finalMsg = msg.toBuilder().setMsgSeq(msg_seq).build();
         var buf = NetUtils.serializeGameMessageBuf(finalMsg.toByteArray(), config);
         var packet = new DatagramPacket(buf, buf.length, addr);
+
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
-        socket.send(packet);
         log.info(msg.getTypeCase().toString());
-        msg_seq++;
         if (msg.hasJoin()) {
-            joinSeq = msg.getMsgSeq();
+            joinSeq = msg_seq;
         }
+
+        msg_seq++;
+        socket.send(packet);
     }
 
     @Override
