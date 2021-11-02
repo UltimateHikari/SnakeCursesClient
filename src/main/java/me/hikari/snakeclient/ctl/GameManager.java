@@ -102,8 +102,7 @@ public class GameManager {
                     .build();
             var msg = SnakesProto.GameMessage.newBuilder()
                     .setJoin(joinMsg)
-                    .setMsgSeq(1)
-                    .build();
+                    .buildPartial();
             communicator.updateMaster(entry.getJoinAddress());
             communicator.sendMessageToMaster(msg);
         } else {

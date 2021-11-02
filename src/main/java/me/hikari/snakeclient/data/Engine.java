@@ -60,7 +60,7 @@ public class Engine {
         var steer = SnakesProto.GameMessage.SteerMsg.newBuilder()
                 .setDirection(direction).build();
         var msg = SnakesProto.GameMessage.newBuilder()
-                .setSteer(steer).setMsgSeq(1).build();
+                .setSteer(steer).buildPartial();
         communicator.sendMessageToMaster(msg);
     }
 
@@ -155,8 +155,7 @@ public class Engine {
                 .setState(
                         getDTO().retrieveState()
                 )
-                .setMsgSeq(1)
-                .build();
+                .buildPartial();
 
         for (Player p : players) {
             if (!localPlayer.equals(p)) {

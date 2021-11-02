@@ -73,8 +73,7 @@ public class CommWorker implements Runnable, Communicator {
         // all acks matter because of join-ack
         Long confirmedSeq = msg.getMsgSeq();
         if (seqs.containsKey(confirmedSeq)) {
-            datagrams.remove(seqs.get(confirmedSeq));
-            seqs.remove(confirmedSeq);
+            datagrams.remove(seqs.remove(confirmedSeq));
             if (Objects.equals(joinSeq, confirmedSeq)) {
                 manager.join(msg.getReceiverId());
             }
@@ -124,7 +123,7 @@ public class CommWorker implements Runnable, Communicator {
         var buf = NetUtils.serializeGameMessageBuf(answer.build().toByteArray(), config);
         var answerPacket = new DatagramPacket(buf, buf.length, peer);
         socket.send(answerPacket);
-        log.info(answerPacket.getPort() + " " + answer);
+        log.info(answerPacket.getPort() + ":ACK for " + msg.getMsgSeq());
 
     }
 
@@ -135,6 +134,7 @@ public class CommWorker implements Runnable, Communicator {
     }
 
     public void spam(SnakesProto.GameMessage.AnnouncementMsg announce) throws IOException {
+        // this MsgSeq is not bound with game and acks'll be ignored
         var msg = SnakesProto.GameMessage.newBuilder()
                 .setAnnouncement(announce).setMsgSeq(msg_seq).build().toByteArray();
         var buf = NetUtils.serializeGameMessageBuf(msg, config);
@@ -144,8 +144,8 @@ public class CommWorker implements Runnable, Communicator {
 
     @Synchronized("sendLock")
     public void sendMessage(SnakesProto.GameMessage msg, InetSocketAddress addr) throws IOException {
-        msg.toBuilder().setMsgSeq(msg_seq).build();
-        var buf = NetUtils.serializeGameMessageBuf(msg.toByteArray(), config);
+        SnakesProto.GameMessage finalMsg = msg.toBuilder().setMsgSeq(msg_seq).build();
+        var buf = NetUtils.serializeGameMessageBuf(finalMsg.toByteArray(), config);
         var packet = new DatagramPacket(buf, buf.length, addr);
         datagrams.put(packet, System.currentTimeMillis());
         seqs.put(msg_seq, packet);
