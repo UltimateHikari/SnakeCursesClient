@@ -67,20 +67,24 @@ class CommWorker implements Runnable, Communicator, Sender {
     @Synchronized("nodeInfoLock")
     void actualizeNodes() throws IOException {
         var time = System.currentTimeMillis();
-        if (time - master.getLastRecvTime() > engineConfig.getNodeTimeoutMs()) {
-            manager.masterFailed();
-        } else {
-            if (time - master.getLastSentTime() > engineConfig.getPingDelayMs()) {
-                sendPing(master.getAddr());
-                master.setLastSentTime(time);
+        if (master != null) {
+            if (time - master.getLastRecvTime() > engineConfig.getNodeTimeoutMs()) {
+                manager.masterFailed();
+            } else {
+                if (time - master.getLastSentTime() > engineConfig.getPingDelayMs()) {
+                    sendPing(master.getAddr());
+                    master.setLastSentTime(time);
+                }
             }
         }
-        if (time - deputy.getLastRecvTime() > engineConfig.getNodeTimeoutMs()) {
-            manager.deputyFailed();
-        } else {
-            if (time - deputy.getLastSentTime() > engineConfig.getPingDelayMs()) {
-                sendPing(deputy.getAddr());
-                deputy.setLastSentTime(time);
+        if (deputy != null) {
+            if (time - deputy.getLastRecvTime() > engineConfig.getNodeTimeoutMs()) {
+                manager.deputyFailed();
+            } else {
+                if (time - deputy.getLastSentTime() > engineConfig.getPingDelayMs()) {
+                    sendPing(deputy.getAddr());
+                    deputy.setLastSentTime(time);
+                }
             }
         }
     }
@@ -224,11 +228,18 @@ class CommWorker implements Runnable, Communicator, Sender {
     @Override
     @Synchronized("nodeInfoLock")
     public void updateMaster(InetSocketAddress addr) {
-        if(master != null) {
+        if (master != null) {
             resender.changeMasterInBufferedDatagrams(master.getAddr(), addr);
         }
         var time = System.currentTimeMillis();
         master = new NodeInfo(addr, time, time);
+    }
+
+    @Override
+    @Synchronized("nodeInfoLock")
+    public void updateMasterToDeputy() {
+        master = deputy;
+        deputy = null;
     }
 
     @Override

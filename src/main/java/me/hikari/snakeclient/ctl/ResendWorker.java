@@ -61,6 +61,7 @@ class ResendWorker implements Runnable, Resender{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                // TODO add remove if too long
             }
         });
     }

@@ -3,6 +3,8 @@ package me.hikari.snakeclient.ctl;
 import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakes.SnakesProto;
 
+import java.io.IOException;
+
 interface MessageDelegate {
     void joinAsNormal(Integer receiverId);
 
@@ -22,7 +24,7 @@ interface MessageDelegate {
 
     void handleReceiverRoleChange(SnakesProto.NodeRole role);
 
-    void masterFailed();
+    void masterFailed() throws IOException;
 
     void deputyFailed();
 }

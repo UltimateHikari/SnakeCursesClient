@@ -16,5 +16,7 @@ public interface Communicator {
 
     void updateMaster(InetSocketAddress addr);
 
+    void updateMasterToDeputy();
+
     void updateDeputy(InetSocketAddress addr);
 }

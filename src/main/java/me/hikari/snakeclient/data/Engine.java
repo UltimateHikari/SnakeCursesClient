@@ -9,6 +9,7 @@ import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -48,14 +49,14 @@ public class Engine {
         return dto;
     }
 
-    public Integer joinPlayer(Peer peer, String name) throws IllegalStateException{
+    public Integer joinPlayer(Peer peer, String name) throws IllegalStateException {
         Integer id = players.stream()
                 .max(Comparator.comparing(Player::getId))
                 .get().getId() + 1;
         Player newcomer = new Player(peer, name, id);
-        if(addPlayer(newcomer)) {
+        if (addPlayer(newcomer)) {
             return id;
-        } else{
+        } else {
             throw new IllegalStateException("No empty space on field");
         }
     }
@@ -203,6 +204,24 @@ public class Engine {
         for (Player p : players) {
             if (!localPlayer.equals(p)) {
                 communicator.sendMessage(msg, p.formAddress());
+            }
+        }
+    }
+
+    public void propagateNewMaster() throws IOException {
+        var roleMsg = SnakesProto.GameMessage.RoleChangeMsg.newBuilder()
+                .setSenderRole(SnakesProto.NodeRole.MASTER)
+                .build();
+        var msg = SnakesProto.GameMessage.newBuilder()
+                .setRoleChange(roleMsg)
+                .buildPartial();
+        for (Player p : players) {
+            if (p.getRole() != SnakesProto.NodeRole.MASTER){
+                communicator.sendMessage(msg, p.formAddress());
+            }else{
+                if(!p.equals(localPlayer)){
+                    p.setRole(SnakesProto.NodeRole.VIEWER);
+                }
             }
         }
     }

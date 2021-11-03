@@ -17,8 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO: mechanism for checking master health
- * if we are deputy
+ * TODO: deputy election
  * TODO: mechanism of graceful game exit and reenter (line 30)
  */
 
@@ -83,11 +82,11 @@ class GameManager implements InputDelegate, MessageDelegate {
         startWorkers();
     }
 
+    /**
+     * endless loop on listening inside communicator;
+     * our boy also can send stuff, but via handles for other workers
+     */
     public void start() {
-        /**
-         * endless loop on listening inside communicator;
-         * our boy also can send stuff, but via handles for other workers
-         */
         communicator.run();
     }
 
@@ -241,8 +240,16 @@ class GameManager implements InputDelegate, MessageDelegate {
     }
 
     @Override
-    public void masterFailed() {
-        // TODO stub
+    public void masterFailed() throws IOException {
+        if (localPlayer.getRole() == SnakesProto.NodeRole.DEPUTY) {
+            currentEngine.setSelfRole(SnakesProto.NodeRole.MASTER);
+            synchronizer.setRole(SnakesProto.NodeRole.MASTER);
+            currentEngine.propagateNewMaster();
+            // engine is already spinned
+        }
+        if (localPlayer.getRole() == SnakesProto.NodeRole.NORMAL) {
+            communicator.updateMasterToDeputy();
+        }
     }
 
     @Override
