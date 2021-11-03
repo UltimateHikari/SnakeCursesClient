@@ -80,7 +80,16 @@ class CommWorker implements Runnable, Communicator {
     }
 
     private void handleJoin(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        var receiverID = manager.handleJoinMsg(NetUtils.getPeer(packet), msg.getJoin().getName());
+        Integer receiverID = -1;
+        try {
+            receiverID = manager.handleJoinMsg(NetUtils.getPeer(packet), msg.getJoin().getName());
+        } catch (IllegalStateException e) {
+            log.info("Sending error: " + e.getMessage());
+            var errMsg = SnakesProto.GameMessage.ErrorMsg.newBuilder()
+                    .setErrorMessage(e.getMessage()).build();
+            var finalErrMsg = SnakesProto.GameMessage.newBuilder().setError(errMsg).buildPartial();
+            sendMessage(finalErrMsg, (InetSocketAddress) packet.getSocketAddress());
+        }
         sendAckVerbose(msg, packet, receiverID);
     }
 
@@ -95,11 +104,11 @@ class CommWorker implements Runnable, Communicator {
     }
 
     private void handleChange(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.MASTER){
+        if (msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.MASTER) {
             updateMaster(packet);
         }
 
-        if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER){
+        if (msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER) {
             // player voluntarily exit
             manager.handleExitChange(NetUtils.getPeer(packet));
         }
@@ -107,7 +116,7 @@ class CommWorker implements Runnable, Communicator {
         sendAck(msg, packet);
     }
 
-    private void sendAck(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException{
+    private void sendAck(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         sendAckVerbose(msg, packet, manager.getPeerID(NetUtils.getPeer(packet)));
     }
 

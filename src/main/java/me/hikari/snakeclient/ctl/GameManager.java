@@ -208,7 +208,7 @@ class GameManager implements InputDelegate, MessageDelegate{
     }
 
     @Override
-    public Integer handleJoinMsg(Peer peer, String name) {
+    public Integer handleJoinMsg(Peer peer, String name) throws IllegalStateException{
         return currentEngine.joinPlayer(peer, name);
     }
 

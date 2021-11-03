@@ -48,13 +48,16 @@ public class Engine {
         return dto;
     }
 
-    public Integer joinPlayer(Peer peer, String name) {
+    public Integer joinPlayer(Peer peer, String name) throws IllegalStateException{
         Integer id = players.stream()
                 .max(Comparator.comparing(Player::getId))
                 .get().getId() + 1;
         Player newcomer = new Player(peer, name, id);
-        addPlayer(newcomer);
-        return id;
+        if(addPlayer(newcomer)) {
+            return id;
+        } else{
+            throw new IllegalStateException("No empty space on field");
+        }
     }
 
     public void sendSteer(SnakesProto.Direction direction) throws IOException {
@@ -94,16 +97,16 @@ public class Engine {
     }
 
     @Synchronized("stateLock")
-    public void addPlayer(Player player) {
+    public boolean addPlayer(Player player) {
         var head = findSnakeSpawn();
         log.info("spawning on " + head.toString());
         if (Spawner.isValid(head)) {
             this.snakes.add(spawnSnake(player.getId(), head));
             this.players.add(player);
             log.info("spawn done");
-        } else {
-            // TODO send error message
+            return true;
         }
+        return false;
     }
 
     private Coord findSnakeSpawn() {
