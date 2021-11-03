@@ -31,7 +31,7 @@ class Spawner {
     Coord find() {
         for (int i = 0; i < isInvalidated.length; i++) {
             if (!isInvalidated[i]) {
-                return new Coord(i / dims.getX(), i % dims.getX());
+                return new Coord(i % dims.getX(), i / dims.getX());
             }
         }
         return INVALID_COORD;

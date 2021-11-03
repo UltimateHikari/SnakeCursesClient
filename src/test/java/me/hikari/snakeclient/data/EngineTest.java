@@ -13,7 +13,7 @@ public class EngineTest {
     public void testPlayerAddition() throws IOException {
         var config = Main.parseConfig();
         var world = config.getEngineConfig().getWorldSize();
-        var maxSnakes = world.getX() * world.getY() / 25;
+        var maxSnakes = world.getX() * world.getY() / 9;
         var player = new Player(config.getPlayerConfig());
         var engine = new Engine(new GameEntry(player, config.getEngineConfig()), player, null);
         for (int i = 0; i < maxSnakes; i++){
