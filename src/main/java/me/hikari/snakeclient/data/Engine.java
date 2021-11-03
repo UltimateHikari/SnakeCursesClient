@@ -100,6 +100,7 @@ public class Engine {
         if (Spawner.isValid(head)) {
             this.snakes.add(spawnSnake(player.getId(), head));
             this.players.add(player);
+            log.info("spawn done");
         } else {
             // TODO send error message
         }
