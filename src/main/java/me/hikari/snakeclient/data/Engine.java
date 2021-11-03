@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.ctl.Communicator;
+import me.hikari.snakeclient.ctl.Game;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
@@ -190,8 +191,38 @@ public class Engine {
             applyMoves();
             moveSnakes();
             propagateState();
+            refreshDeputy();
         }
     }
+
+    private void refreshDeputy() throws IOException {
+        var deputy = players.stream()
+                .filter(p -> p.getRole() == SnakesProto.NodeRole.DEPUTY).findFirst();
+        if (deputy.isEmpty()) {
+            tryElectDeputy();
+        }
+    }
+
+    public Optional<Player> tryElectDeputy() throws IOException {
+        var normal = players.stream()
+                .filter(p -> p.getRole() == SnakesProto.NodeRole.NORMAL).findFirst();
+        if (normal.isPresent()) {
+            var player = normal.get();
+            player.setRole(SnakesProto.NodeRole.DEPUTY);
+            var role = SnakesProto.GameMessage.RoleChangeMsg.newBuilder()
+                    .setReceiverRole(SnakesProto.NodeRole.DEPUTY);
+            var msg = SnakesProto.GameMessage.newBuilder()
+                    .setRoleChange(role)
+                    .buildPartial();
+            communicator.sendMessage(msg, player.formAddress());
+            // a little preemptive, he can ignore rolechange
+            // and ideally should do this in ack
+            communicator.updateDeputy(player.formAddress());
+            return Optional.of(player);
+        }
+        return Optional.empty();
+    }
+
 
     private void propagateState() throws IOException {
         var msg = SnakesProto.GameMessage
@@ -216,10 +247,10 @@ public class Engine {
                 .setRoleChange(roleMsg)
                 .buildPartial();
         for (Player p : players) {
-            if (p.getRole() != SnakesProto.NodeRole.MASTER){
+            if (p.getRole() != SnakesProto.NodeRole.MASTER) {
                 communicator.sendMessage(msg, p.formAddress());
-            }else{
-                if(!p.equals(localPlayer)){
+            } else {
+                if (!p.equals(localPlayer)) {
                     p.setRole(SnakesProto.NodeRole.VIEWER);
                 }
             }

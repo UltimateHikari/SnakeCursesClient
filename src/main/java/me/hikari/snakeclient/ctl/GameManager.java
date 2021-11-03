@@ -253,10 +253,13 @@ class GameManager implements InputDelegate, MessageDelegate {
     }
 
     @Override
-    public void deputyFailed() {
-        // TODO stub
-        // TODO choose deputy
+    public void deputyFailed() throws IOException {
+        var player = currentEngine.tryElectDeputy();
+        if (player.isPresent()) {
+            communicator.updateDeputy(player.get().formAddress());
+        }
     }
+
 
     @Override
     public KeyStroke getInput() throws IOException {

@@ -26,5 +26,5 @@ interface MessageDelegate {
 
     void masterFailed() throws IOException;
 
-    void deputyFailed();
+    void deputyFailed() throws IOException;
 }
