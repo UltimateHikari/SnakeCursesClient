@@ -1,7 +1,13 @@
 package me.hikari.snakeclient.ctl;
 
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
+import me.hikari.snakeclient.data.Peer;
+import me.hikari.snakeclient.data.Player;
+import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
@@ -12,14 +18,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+
 @Log4j2
 class ResendWorker implements Runnable, Resender{
     private final Object buffersLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
-    private Sender communicator;
+    private final Sender communicator;
     private final Map<DatagramPacket, Long> datagrams = new HashMap<>();
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
-    private Long joinSeq;
+    private Long joinSeq = null;
 
     ResendWorker(Sender communicator){
         this.communicator = communicator;
@@ -27,11 +34,13 @@ class ResendWorker implements Runnable, Resender{
     }
 
     @Override
+    @Synchronized("buffersLock")
     public void run() {
         resendAll();
     }
 
     @Override
+    @Synchronized("buffersLock")
     public void handleAck(SnakesProto.GameMessage msg, Consumer<Integer> join) {
         Long confirmedSeq = msg.getMsgSeq();
         if (seqs.containsKey(confirmedSeq)) {
@@ -43,13 +52,12 @@ class ResendWorker implements Runnable, Resender{
         log.debug(confirmedSeq + ":" + seqs);
     }
 
-
     public void resendAll() {
         var time = System.currentTimeMillis();
         datagrams.forEach((k, v) -> {
             if (time - v > RESEND_TIMEOUT_MS) {
                 try {
-                    resend(k, time);
+                    resend(k);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -58,7 +66,8 @@ class ResendWorker implements Runnable, Resender{
     }
 
     @Override
-    public void changeMaster(InetSocketAddress oldMaster, InetSocketAddress newMaster) {
+    @Synchronized("buffersLock")
+    public void changeMasterInBufferedDatagrams(InetSocketAddress oldMaster, InetSocketAddress newMaster) {
         // TODO: stub
     }
 
@@ -72,9 +81,8 @@ class ResendWorker implements Runnable, Resender{
         }
     }
 
-    private void resend(DatagramPacket p, Long time) throws IOException {
-        //TODO resend to new master
+    @Synchronized("buffersLock")
+    private void resend(DatagramPacket p) throws IOException {
         communicator.send(p);
-        datagrams.put(p, time);
     }
 }

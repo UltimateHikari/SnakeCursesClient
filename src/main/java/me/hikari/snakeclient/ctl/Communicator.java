@@ -15,4 +15,6 @@ public interface Communicator {
     void sendMessageToMaster(SnakesProto.GameMessage msg) throws IOException;
 
     void updateMaster(InetSocketAddress addr);
+
+    void updateDeputy(InetSocketAddress addr);
 }

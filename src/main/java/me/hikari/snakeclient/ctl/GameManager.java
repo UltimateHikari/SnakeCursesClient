@@ -19,13 +19,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * TODO: mechanism for checking master health
  * if we are deputy
+ * TODO: mechanism of graceful game exit and reenter (line 30)
  */
 
-class GameManager implements InputDelegate, MessageDelegate{
+class GameManager implements InputDelegate, MessageDelegate {
     private static final int UI_REFRESH_RATE_MS = 10;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
     private ScheduledFuture<?> currentGame = null;
-    private List<ScheduledFuture<?>> handlers = new ArrayList<>();
+    private final List<ScheduledFuture<?>> handlers = new ArrayList<>();
 
     private final GameConfig config;
     private Engine currentEngine = null;
@@ -73,7 +74,12 @@ class GameManager implements InputDelegate, MessageDelegate{
         this.localPlayer = new Player(config.getPlayerConfig());
         this.gameList = new MetaEngine(new GameEntry(localPlayer, config.getEngineConfig()));
         this.listener = new ListenWorker(this, config.getNetConfig());
-        this.communicator = new CommWorker(this, config.getNetConfig(), config.getPlayerConfig().getPort());
+        this.communicator = new CommWorker(
+                this,
+                config.getNetConfig(),
+                config.getEngineConfig(),
+                config.getPlayerConfig().getPort()
+        );
         startWorkers();
     }
 
@@ -208,7 +214,7 @@ class GameManager implements InputDelegate, MessageDelegate{
     }
 
     @Override
-    public Integer handleJoinMsg(Peer peer, String name) throws IllegalStateException{
+    public Integer handleJoinMsg(Peer peer, String name) throws IllegalStateException {
         return currentEngine.joinPlayer(peer, name);
     }
 
@@ -225,13 +231,24 @@ class GameManager implements InputDelegate, MessageDelegate{
     @Override
     public void handleReceiverRoleChange(SnakesProto.NodeRole role) {
         synchronizer.setRole(role);
-        if(role == SnakesProto.NodeRole.MASTER || role == SnakesProto.NodeRole.DEPUTY){
+        if (role == SnakesProto.NodeRole.MASTER || role == SnakesProto.NodeRole.DEPUTY) {
             // idling when deputy for faster start at master death
             spinEngine(config.getEngineConfig().getStateDelayMs());
             spinAnnouncer();
         }
         // for sync with rest of engine
         currentEngine.setSelfRole(role);
+    }
+
+    @Override
+    public void masterFailed() {
+        // TODO stub
+    }
+
+    @Override
+    public void deputyFailed() {
+        // TODO stub
+        // TODO choose deputy
     }
 
     @Override

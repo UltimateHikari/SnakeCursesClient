@@ -21,4 +21,8 @@ interface MessageDelegate {
     void handleExitChange(Peer peer);
 
     void handleReceiverRoleChange(SnakesProto.NodeRole role);
+
+    void masterFailed();
+
+    void deputyFailed();
 }
