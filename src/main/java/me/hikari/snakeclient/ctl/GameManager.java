@@ -58,7 +58,7 @@ class GameManager implements InputDelegate, MessageDelegate{
         handlers.add(scheduler.scheduleWithFixedDelay(
                 new ResendWorker(communicator),
                 0,
-                CommWorker.RESEND_TIMEOUT_MS,
+                ResendWorker.RESEND_TIMEOUT_MS,
                 TimeUnit.MILLISECONDS));
         handlers.add(scheduler.schedule(
                 listener,
