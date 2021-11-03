@@ -4,35 +4,38 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FieldRepresentation {
-    private enum CellType{
+
+    private enum CellType {
         EMPTY,
         SNAKE,
         FOOD,
         SNAKE_COL,
         FOOD_COL; //means snake ate food
-    };
+    }
+
+    ;
     private final CellType[] field;
     private final Integer xDim;
 
-    FieldRepresentation(Coord dims, List<Coord> foods){
+    FieldRepresentation(Coord dims, List<Coord> foods) {
         xDim = dims.getX();
-        field = new CellType[dims.getX()*dims.getY()];
+        field = new CellType[dims.getX() * dims.getY()];
         Arrays.fill(field, CellType.EMPTY);
-        for(Coord c: foods){
+        for (Coord c : foods) {
             setCell(c, CellType.FOOD);
         }
     }
 
-    private CellType getCell(Coord c){
-        return field[xDim*c.getY() + c.getX()];
+    private CellType getCell(Coord c) {
+        return field[xDim * c.getY() + c.getX()];
     }
 
-    private void setCell(Coord c, CellType type){
-        field[xDim*c.getY() + c.getX()] = type;
+    private void setCell(Coord c, CellType type) {
+        field[xDim * c.getY() + c.getX()] = type;
     }
 
-    public void putSnakeCell(Coord c){
-        switch (getCell(c)){
+    public void putSnakeCell(Coord c) {
+        switch (getCell(c)) {
             case SNAKE_COL:
                 break;
             case FOOD:
@@ -47,11 +50,15 @@ public class FieldRepresentation {
 
     }
 
-    public boolean isCellSnakeCollided(Coord c){
+    public boolean isCellSnakeCollided(Coord c) {
         return getCell(c) == CellType.SNAKE_COL;
     }
 
-    public boolean isCellFoodCollided(Coord c){
+    public boolean isCellFoodCollided(Coord c) {
         return getCell(c) == CellType.FOOD_COL;
+    }
+
+    public boolean isCellEmpty(Coord c) {
+        return getCell(c) == CellType.EMPTY;
     }
 }

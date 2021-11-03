@@ -154,20 +154,19 @@ public class Engine {
         return 0;
     }
 
-    /**
-     * TODO
-     * update food spawn algo
-     */
-
     private void replenishFood() {
+        var field = new FieldRepresentation(config.getWorldSize(), foods);
+        snakes.forEach(s -> s.showYourself(field::putSnakeCell, config.getWorldSize()));
         var r = new Random();
         while (foods.size() < config.getFoodStatic()) {
-            foods.add(
-                    new Coord(
-                            r.nextInt(config.getWorldSize().getX()),
-                            r.nextInt(config.getWorldSize().getY())
-                    )
+            //potential problems if almost whole field is snake
+            var c = new Coord(
+                    r.nextInt(config.getWorldSize().getX()),
+                    r.nextInt(config.getWorldSize().getY())
             );
+            if (field.isCellEmpty(c)) {
+                foods.add(c);
+            }
         }
     }
 
