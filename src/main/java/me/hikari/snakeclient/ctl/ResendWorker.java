@@ -81,7 +81,6 @@ class ResendWorker implements Runnable, Resender{
         }
     }
 
-    @Synchronized("buffersLock")
     private void resend(DatagramPacket p) throws IOException {
         communicator.send(p);
     }

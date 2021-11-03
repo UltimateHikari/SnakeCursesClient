@@ -39,8 +39,8 @@ class CommWorker implements Runnable, Communicator, Sender {
     private long msg_seq = 1;
     private Resender resender;
 
-    private NodeInfo master;
-    private NodeInfo deputy;
+    private NodeInfo master = null;
+    private NodeInfo deputy = null;
 
     CommWorker(
             MessageDelegate gameManager,
@@ -224,7 +224,9 @@ class CommWorker implements Runnable, Communicator, Sender {
     @Override
     @Synchronized("nodeInfoLock")
     public void updateMaster(InetSocketAddress addr) {
-        resender.changeMasterInBufferedDatagrams(master.getAddr(), addr);
+        if(master != null) {
+            resender.changeMasterInBufferedDatagrams(master.getAddr(), addr);
+        }
         var time = System.currentTimeMillis();
         master = new NodeInfo(addr, time, time);
     }
