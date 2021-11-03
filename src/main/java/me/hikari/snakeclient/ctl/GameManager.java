@@ -17,7 +17,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO: deputy election
  * TODO: mechanism of graceful game exit and reenter (line 30)
  */
 

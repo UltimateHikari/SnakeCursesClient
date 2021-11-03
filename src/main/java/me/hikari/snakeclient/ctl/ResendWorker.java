@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 
 @Log4j2
-class ResendWorker implements Runnable, Resender{
+class ResendWorker implements Runnable, Resender {
     private final Object buffersLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
     private final Sender communicator;
@@ -28,7 +28,7 @@ class ResendWorker implements Runnable, Resender{
     private Map<Long, DatagramPacket> seqs = new HashMap<>();
     private Long joinSeq = null;
 
-    ResendWorker(Sender communicator){
+    ResendWorker(Sender communicator) {
         this.communicator = communicator;
         communicator.bindResender(this);
     }
@@ -61,7 +61,7 @@ class ResendWorker implements Runnable, Resender{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // TODO add remove if too long
+                // TODO add remove if too many resends
             }
         });
     }
@@ -69,7 +69,11 @@ class ResendWorker implements Runnable, Resender{
     @Override
     @Synchronized("buffersLock")
     public void changeMasterInBufferedDatagrams(InetSocketAddress oldMaster, InetSocketAddress newMaster) {
-        // TODO: stub
+        datagrams.forEach((k, v) -> {
+            if (k.getSocketAddress().equals(oldMaster)) {
+                k.setSocketAddress(newMaster);
+            }
+        });
     }
 
     @Override
