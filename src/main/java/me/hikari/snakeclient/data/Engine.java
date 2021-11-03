@@ -95,19 +95,26 @@ public class Engine {
 
     @Synchronized("stateLock")
     public void addPlayer(Player player) {
-        this.snakes.add(spawnSnake(player.getId()));
-        this.players.add(player);
+        var head = findSnakeSpawn();
+        log.info("spawning on " + head.toString());
+        if (Spawner.isValid(head)) {
+            this.snakes.add(spawnSnake(player.getId(), head));
+            this.players.add(player);
+        } else {
+            // TODO send error message
+        }
     }
 
-    /**
-     * TODO
-     * update spawning algo,
-     */
+    private Coord findSnakeSpawn() {
+        var worldSize = config.getWorldSize();
+        var spawner = new Spawner(worldSize);
+        snakes.forEach(s -> s.showYourself(spawner::putSnakeCell, worldSize));
+        return spawner.find();
+    }
 
-    private Snake spawnSnake(Integer id) {
-
+    private Snake spawnSnake(Integer id, Coord head) {
         return new Snake(id, new Coord(SnakesProto.Direction.RIGHT),
-                new Coord(5, 5), new Coord(SnakesProto.Direction.LEFT));
+                head, new Coord(SnakesProto.Direction.LEFT));
     }
 
     public void noteHostMove(SnakesProto.Direction move) {
@@ -273,7 +280,7 @@ public class Engine {
         // try-catch because of usage as reference
         log.info("Exiling player.. " + p.getName());
         p.setRole(SnakesProto.NodeRole.VIEWER);
-        if(p.equals(localPlayer)){
+        if (p.equals(localPlayer)) {
             log.info("Exiled self");
             return;
         }
@@ -288,7 +295,7 @@ public class Engine {
         log.info("Notifying player " + p.getName());
         try {
             communicator.sendMessage(msg, p.formAddress());
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error(e);
         }
         log.info("..Done");

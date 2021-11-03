@@ -37,7 +37,7 @@ public class MetaEngine {
 
     public void addGame(GameEntry entry) {
         synchronized (mapMonitor) {
-            // TODO check on duplicates from that player
+            // minor TODO check on duplicates from that player
             long time = System.currentTimeMillis();
             for(GameEntry e : games.keySet()){
                 if(e.equals(entry)){
