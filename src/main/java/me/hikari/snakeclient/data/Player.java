@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 public class Player {
     private final String name;
     private Integer id;
+    @EqualsAndHashCode.Exclude
     private final String ip;
     private final Integer port;
     @Setter

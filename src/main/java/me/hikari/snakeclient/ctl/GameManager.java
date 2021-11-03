@@ -264,4 +264,8 @@ class GameManager implements InputDelegate, MessageDelegate {
     public KeyStroke getInput() throws IOException {
         return ui.getInput();
     }
+
+    public void actualizeNodeInfo() throws IOException {
+        communicator.actualizeNodes();
+    }
 }
