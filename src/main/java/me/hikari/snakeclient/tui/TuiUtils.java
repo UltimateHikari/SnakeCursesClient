@@ -6,6 +6,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import me.hikari.snakeclient.data.Coord;
+import me.hikari.snakeclient.data.Player;
 import me.hikari.snakeclient.data.UIConfig;
 import me.hikari.snakeclient.data.UIGameEntry;
 
@@ -112,5 +113,18 @@ class TuiUtils {
 
     public static void clearRectangleByBorder(TextGraphics tg, TerminalPosition pos, TerminalSize size){
         tg.fillRectangle(shift(pos, 0), removeBorder(size), ' ');
+    }
+
+    public static String playerScore(Player p) {
+        return p.getName() + "[" + playerRole(p) + "]: " + p.getScore();
+    }
+
+    private static String playerRole(Player p){
+        return switch (p.getRole()) {
+            case MASTER -> "M";
+            case DEPUTY -> "D";
+            case NORMAL -> "N";
+            case VIEWER -> "V";
+        };
     }
 }

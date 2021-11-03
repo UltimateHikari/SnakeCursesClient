@@ -23,7 +23,7 @@ class GameScreen {
     private final GameGrid grid = new GameGrid();
 
     private TerminalSize size;
-    private Brush brush = new Brush();
+    private final Brush brush = new Brush();
 
     private void drawHeader(TextGraphics tg) {
         var pos = grid.getHeaderPos(size);
@@ -67,16 +67,12 @@ class GameScreen {
         TuiUtils.clearRectangleByBorder(tg, pos, grid.getScoreSize(size));
         Player[] sPlayers = players.stream()
                 .sorted(Comparator.comparing(Player::getScore))
-                .toArray(size -> new Player[size]);
+                .toArray(Player[]::new);
         for (int i = 0; i < sPlayers.length; i++) {
             tg.setForegroundColor(brush.getColor(sPlayers[i]));
-            tg.putString(TuiUtils.shift(pos, i), playerScore(sPlayers[i]));
+            tg.putString(TuiUtils.shift(pos, i), TuiUtils.playerScore(sPlayers[i]));
         }
         tg.clearModifiers();
-    }
-
-    private String playerScore(Player p) {
-        return p.getName() + ": " + p.getScore();
     }
 
     public void show(EngineDTO dto) throws IOException {
