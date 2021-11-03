@@ -12,11 +12,13 @@ interface MessageDelegate {
 
     Integer getLocalID();
 
+    Integer getPeerID(Peer peer);
+
     void handleStateMsg(SnakesProto.GameState state);
 
     void handleErrorMsg(String errorMessage);
 
     void handleExitChange(Peer peer);
 
-    Integer handleReceiverRoleChange(SnakesProto.NodeRole role);
+    void handleReceiverRoleChange(SnakesProto.NodeRole role);
 }

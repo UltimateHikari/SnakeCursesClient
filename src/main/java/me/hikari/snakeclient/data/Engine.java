@@ -71,11 +71,6 @@ public class Engine {
         isLatest = false;
     }
 
-    public void exilePlayer(Peer peer) {
-        var player = players.stream().filter(peer::equals).findFirst();
-        player.ifPresent(value -> value.setRole(SnakesProto.NodeRole.VIEWER));
-    }
-
     @Synchronized("stateLock")
     public void setSelfRole(SnakesProto.NodeRole role) {
         localPlayer.setRole(role);
@@ -125,8 +120,24 @@ public class Engine {
     }
 
     public void notePeerMove(Peer peer, SnakesProto.Direction move) {
-        var player = players.stream().filter(peer::equals).findFirst();
-        player.ifPresent(value -> notePlayerMove(value, move));
+        findPeer(peer).ifPresent(value -> notePlayerMove(value, move));
+    }
+
+    private Optional<Player> findPeer(Peer peer){
+        return players.stream().filter(peer::equals).findFirst();
+    }
+
+    @Synchronized("stateLock")
+    public void exilePlayer(Peer peer) {
+        findPeer(peer).ifPresent(value -> value.setRole(SnakesProto.NodeRole.VIEWER));
+    }
+
+    public Integer getPeerID(Peer peer) {
+        var opt = findPeer(peer);
+        if(opt.isPresent()){
+            return opt.get().getId();
+        }
+        return 0;
     }
 
     /**

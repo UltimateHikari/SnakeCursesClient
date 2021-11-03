@@ -188,6 +188,11 @@ class GameManager implements InputDelegate, MessageDelegate{
     }
 
     @Override
+    public Integer getPeerID(Peer peer) {
+        return currentEngine.getPeerID(peer);
+    }
+
+    @Override
     public void sendSteer(SnakesProto.Direction direction) throws IOException {
         currentEngine.sendSteer(direction);
     }
@@ -218,7 +223,7 @@ class GameManager implements InputDelegate, MessageDelegate{
     }
 
     @Override
-    public Integer handleReceiverRoleChange(SnakesProto.NodeRole role) {
+    public void handleReceiverRoleChange(SnakesProto.NodeRole role) {
         synchronizer.setRole(role);
         if(role == SnakesProto.NodeRole.MASTER || role == SnakesProto.NodeRole.DEPUTY){
             // idling when deputy for faster start at master death
@@ -227,8 +232,6 @@ class GameManager implements InputDelegate, MessageDelegate{
         }
         // for sync with rest of engine
         currentEngine.setSelfRole(role);
-
-        return localPlayer.getId();
     }
 
     @Override

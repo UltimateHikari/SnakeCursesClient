@@ -1,6 +1,7 @@
 package me.hikari.snakeclient.ctl;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
@@ -21,5 +22,9 @@ class NetUtils {
 
     public static byte [] serializeGameMessageBuf(byte [] buf, NetConfig config){
         return ByteBuffer.allocate(config.getMaxMsgSize()).putInt(buf.length).put(buf).array();
+    }
+
+    public static Peer getPeer(DatagramPacket packet) {
+        return new Peer(packet.getAddress().getHostAddress(), packet.getPort());
     }
 }

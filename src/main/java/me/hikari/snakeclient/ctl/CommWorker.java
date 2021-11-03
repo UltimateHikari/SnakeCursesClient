@@ -2,7 +2,6 @@ package me.hikari.snakeclient.ctl;
 
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
-import me.hikari.snakeclient.data.Peer;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
@@ -51,11 +50,6 @@ class CommWorker implements Runnable, Communicator {
         }
     }
 
-    private Peer getPeer(DatagramPacket packet) {
-        System.err.println("forming peer from " + packet.getAddress().getHostAddress());
-        return new Peer(packet.getAddress().getHostAddress(), packet.getPort());
-    }
-
     private void handleMsg(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         switch (msg.getTypeCase()) {
             case STEER -> handleSteer(msg, packet);
@@ -81,20 +75,19 @@ class CommWorker implements Runnable, Communicator {
     }
 
     private void handleSteer(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        manager.handleSteerMsg(msg.getSteer().getDirection(), getPeer(packet));
-        sendAck(msg, packet.getSocketAddress(), 0, 0);
+        manager.handleSteerMsg(msg.getSteer().getDirection(), NetUtils.getPeer(packet));
+        sendAck(msg, packet);
     }
 
     private void handleJoin(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
-        var receiverID = manager.handleJoinMsg(getPeer(packet), msg.getJoin().getName());
-        var senderID = manager.getLocalID();
-        sendAck(msg, packet.getSocketAddress(), senderID, receiverID);
+        var receiverID = manager.handleJoinMsg(NetUtils.getPeer(packet), msg.getJoin().getName());
+        sendAckVerbose(msg, packet, receiverID);
     }
 
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         manager.handleStateMsg(msg.getState().getState());
         updateMaster(packet);
-        sendAck(msg, packet.getSocketAddress(), 0, 0);
+        sendAck(msg, packet);
     }
 
     private void handleError(SnakesProto.GameMessage msg) {
@@ -107,29 +100,30 @@ class CommWorker implements Runnable, Communicator {
         }
 
         if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER){
-            manager.handleExitChange(getPeer(packet));
+            manager.handleExitChange(NetUtils.getPeer(packet));
         }
-        // TODO clarify with ids; mb method for peer -> id
-        var receiverID = manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());
-        sendAck(msg, packet.getSocketAddress(), manager.getLocalID(), receiverID);
+        manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());
+        sendAck(msg, packet);
     }
 
-    private boolean isJoinOrChange(SnakesProto.GameMessage msg) {
-        return msg.getTypeCase().equals(SnakesProto.GameMessage.TypeCase.JOIN)
-                || msg.getTypeCase().equals(SnakesProto.GameMessage.TypeCase.ROLE_CHANGE);
+    private void sendAck(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException{
+        sendAckVerbose(msg, packet, manager.getPeerID(NetUtils.getPeer(packet)));
     }
 
-    private void sendAck(SnakesProto.GameMessage msg, SocketAddress peer, Integer senderID, Integer receiverID) throws IOException {
+    private void sendAckVerbose(
+            SnakesProto.GameMessage msg,
+            DatagramPacket packet,
+            Integer receiverID
+    ) throws IOException {
         var answer = SnakesProto.GameMessage.newBuilder()
                 .setMsgSeq(msg.getMsgSeq())
-                .setAck(SnakesProto.GameMessage.AckMsg.newBuilder().build());
-        if (isJoinOrChange(msg)) {
-            answer.setReceiverId(receiverID)
-                    .setSenderId(senderID);
-        }
+                .setReceiverId(receiverID)
+                .setSenderId(manager.getLocalID())
+                .setAck(SnakesProto.GameMessage.AckMsg.newBuilder().build())
+                .build();
 
-        var buf = NetUtils.serializeGameMessageBuf(answer.build().toByteArray(), config);
-        var answerPacket = new DatagramPacket(buf, buf.length, peer);
+        var buf = NetUtils.serializeGameMessageBuf(answer.toByteArray(), config);
+        var answerPacket = new DatagramPacket(buf, buf.length, packet.getSocketAddress());
         socket.send(answerPacket);
         log.info(answerPacket.getPort() + ":ACK for " + msg.getMsgSeq());
 
