@@ -7,6 +7,10 @@ import lombok.Setter;
 import me.hikari.snakeclient.data.config.PlayerConfig;
 import me.hikari.snakes.SnakesProto;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode
@@ -80,5 +84,9 @@ public class Player {
 
     public void become(Integer receiverID) {
         id = receiverID;
+    }
+
+    public InetSocketAddress formAddress() throws UnknownHostException {
+        return new InetSocketAddress(InetAddress.getByName(ip), port);
     }
 }

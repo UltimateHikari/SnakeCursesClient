@@ -100,6 +100,7 @@ class CommWorker implements Runnable, Communicator {
         }
 
         if(msg.getRoleChange().getSenderRole() == SnakesProto.NodeRole.VIEWER){
+            // player voluntarily exit
             manager.handleExitChange(NetUtils.getPeer(packet));
         }
         manager.handleReceiverRoleChange(msg.getRoleChange().getReceiverRole());

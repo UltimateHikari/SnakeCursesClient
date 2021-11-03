@@ -219,7 +219,7 @@ class GameManager implements InputDelegate, MessageDelegate{
 
     @Override
     public void handleExitChange(Peer peer) {
-        currentEngine.exilePlayer(peer);
+        currentEngine.notePeerLeft(peer);
     }
 
     @Override

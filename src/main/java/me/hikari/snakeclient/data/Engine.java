@@ -3,17 +3,17 @@ package me.hikari.snakeclient.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Synchronized;
+import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.ctl.Communicator;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+@Log4j2
 public class Engine {
     private final Object stateLock = new Object();
     private Integer stateOrder = 0;
@@ -123,18 +123,24 @@ public class Engine {
         findPeer(peer).ifPresent(value -> notePlayerMove(value, move));
     }
 
-    private Optional<Player> findPeer(Peer peer){
+    private Optional<Player> findPeer(Peer peer) {
         return players.stream().filter(peer::equals).findFirst();
     }
 
+    private Optional<Player> findSnakeOwner(Snake snake) {
+        var pid = snake.getPlayerID();
+        return players.stream()
+                .filter(p -> p.getId().equals(pid)).findFirst();
+    }
+
     @Synchronized("stateLock")
-    public void exilePlayer(Peer peer) {
+    public void notePeerLeft(Peer peer) {
         findPeer(peer).ifPresent(value -> value.setRole(SnakesProto.NodeRole.VIEWER));
     }
 
     public Integer getPeerID(Peer peer) {
         var opt = findPeer(peer);
-        if(opt.isPresent()){
+        if (opt.isPresent()) {
             return opt.get().getId();
         }
         return 0;
@@ -186,8 +192,7 @@ public class Engine {
 
         for (Player p : players) {
             if (!localPlayer.equals(p)) {
-                var addr = new InetSocketAddress(InetAddress.getByName(p.getIp()), p.getPort());
-                communicator.sendMessage(msg, addr);
+                communicator.sendMessage(msg, p.formAddress());
             }
         }
     }
@@ -234,31 +239,59 @@ public class Engine {
             field.putSnakeCell(head);
         });
 
-        list.forEach((MoveResult m) -> {
-            var head = m.getCoord();
-
-            if (!field.isCellFoodCollided(m.getCoord())) {
-                m.getSnake().dropTail();
-            } else {
-                var player = players.stream()
-                        .filter(p -> p.getId().equals(m.getSnake().getPlayerID())).findFirst();
-                player.ifPresent(Player::score);
-                removeFood(m.getCoord());
-            }
-
-            if (field.isCellSnakeCollided(head)) {
-                m.getSnake().showYourself(c -> {
-                    if (c != head) {
-                        this.spawnFoodWithProb(c);
-                    }
-                }, worldSize);
-                snakes.remove(m.getSnake());
-            }
-        });
+        list.forEach(m -> checkCollisions(m, field));
         replenishFood();
         isLatest = false;
         stateOrder++;
 
+    }
+
+    private void checkCollisions(MoveResult m, FieldRepresentation field) {
+        var head = m.getCoord();
+        var player = findSnakeOwner(m.getSnake());
+
+        if (!field.isCellFoodCollided(m.getCoord())) {
+            m.getSnake().dropTail();
+        } else {
+            player.ifPresent(Player::score);
+            removeFood(m.getCoord());
+        }
+
+        if (field.isCellSnakeCollided(head)) {
+            m.getSnake().showYourself(c -> {
+                if (c != head) {
+                    this.spawnFoodWithProb(c);
+                }
+            }, config.getWorldSize());
+            snakes.remove(m.getSnake());
+            // NOTE: here master can become viewer and die
+            player.ifPresent(this::exilePlayer);
+        }
+    }
+
+    private void exilePlayer(Player p) {
+        // try-catch because of usage as reference
+        log.info("Exiling player.. " + p.getName());
+        p.setRole(SnakesProto.NodeRole.VIEWER);
+        if(p.equals(localPlayer)){
+            log.info("Exiled self");
+            return;
+        }
+        var role = SnakesProto.GameMessage.RoleChangeMsg.newBuilder()
+                .setReceiverRole(SnakesProto.NodeRole.VIEWER)
+                .build();
+        var msg = SnakesProto.GameMessage.newBuilder()
+                .setRoleChange(role)
+                .setSenderId(localPlayer.getId())
+                .setReceiverId(p.getId())
+                .buildPartial();
+        log.info("Notifying player " + p.getName());
+        try {
+            communicator.sendMessage(msg, p.formAddress());
+        } catch (IOException e){
+            log.error(e);
+        }
+        log.info("..Done");
     }
 
     private void spawnFoodWithProb(Coord coord) {
