@@ -281,7 +281,7 @@ public class Engine {
             this.stateOrder = gameState.getStateOrder();
             this.foods = gameState
                     .getFoodsList()
-                    .stream().map(Coord::new).toList();
+                    .stream().map(Coord::new).collect(Collectors.toCollection(ArrayList<Coord>::new));
             this.players = gameState
                     .getPlayers().getPlayersList()
                     .stream().map(Player::new).collect(Collectors.toCollection(ArrayList<Player>::new));
