@@ -66,7 +66,7 @@ class InputWorker implements Runnable {
                     manager.noteSnakeMove(SnakesProto.Direction.UP);
                     return;
                 }
-                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                if(state.getRole() != SnakesProto.NodeRole.VIEWER) {
                     manager.sendSteer(SnakesProto.Direction.UP);
                 }
             }
@@ -80,7 +80,7 @@ class InputWorker implements Runnable {
                     manager.noteSnakeMove(SnakesProto.Direction.DOWN);
                     return;
                 }
-                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                if(state.getRole() != SnakesProto.NodeRole.VIEWER) {
                     manager.sendSteer(SnakesProto.Direction.DOWN);
                 }
             }
@@ -92,7 +92,7 @@ class InputWorker implements Runnable {
                     manager.noteSnakeMove(SnakesProto.Direction.LEFT);
                     return;
                 }
-                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                if(state.getRole() != SnakesProto.NodeRole.VIEWER) {
                     manager.sendSteer(SnakesProto.Direction.LEFT);
                 }
             }
@@ -104,7 +104,7 @@ class InputWorker implements Runnable {
                     manager.noteSnakeMove(SnakesProto.Direction.RIGHT);
                     return;
                 }
-                if(state.getRole() == SnakesProto.NodeRole.NORMAL) {
+                if(state.getRole() != SnakesProto.NodeRole.VIEWER) {
                     manager.sendSteer(SnakesProto.Direction.RIGHT);
                 }
             }
