@@ -373,7 +373,14 @@ public class Engine {
     }
 
 
-    public void reconnectLocalPlayers(){
-        players.replaceAll(p -> p.equals(localPlayer) ? localPlayer : p);
+    public void reconnectLocalPlayers() {
+        players.replaceAll(p -> {
+            if (p.equals(localPlayer)) {
+                localPlayer.setScore(p.getScore());
+                return localPlayer;
+            }else{
+                return p;
+            }
+        });
     }
 }

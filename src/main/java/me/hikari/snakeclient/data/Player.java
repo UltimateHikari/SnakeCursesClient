@@ -24,6 +24,7 @@ public class Player {
     @EqualsAndHashCode.Exclude
     private SnakesProto.NodeRole role;
     @EqualsAndHashCode.Exclude
+    @Setter
     private Integer score;
 
     public Player(PlayerConfig config) {
