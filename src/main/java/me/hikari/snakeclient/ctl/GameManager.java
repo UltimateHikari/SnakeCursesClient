@@ -2,6 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.data.*;
 import me.hikari.snakeclient.data.config.GameConfig;
 import me.hikari.snakeclient.tui.PluggableUI;
@@ -10,6 +11,7 @@ import me.hikari.snakes.SnakesProto;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,11 +22,12 @@ import java.util.concurrent.TimeUnit;
  * TODO: mechanism of graceful game exit and reenter (line 30)
  */
 
+@Log4j2
 class GameManager implements InputDelegate, MessageDelegate {
     private static final int UI_REFRESH_RATE_MS = 10;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
-    private ScheduledFuture<?> currentGame = null;
-    private final List<ScheduledFuture<?>> handlers = new ArrayList<>();
+    private final List<ScheduledFuture<?>> generalHandlers = new ArrayList<>();
+    private final List<ScheduledFuture<?>> gameHandlers = new LinkedList<>();
 
     private final GameConfig config;
     private Engine currentEngine = null;
@@ -39,31 +42,45 @@ class GameManager implements InputDelegate, MessageDelegate {
 
 
     private void startWorkers() {
-        handlers.add(scheduler.scheduleAtFixedRate(
-                new UIWorker(this),
-                0,
-                UI_REFRESH_RATE_MS,
-                TimeUnit.MILLISECONDS));
-        handlers.add(scheduler.scheduleWithFixedDelay(
-                new InputWorker(this, config.getKeyConfig()),
-                0,
-                UI_REFRESH_RATE_MS,
-                TimeUnit.MILLISECONDS));
-        handlers.add(scheduler.scheduleWithFixedDelay(
-                new ActualizeWorker(this),
-                0,
-                MetaEngine.GAME_KEEP_ALIVE_MS,
-                TimeUnit.MILLISECONDS));
-        handlers.add(scheduler.scheduleWithFixedDelay(
-                new ResendWorker(communicator),
-                0,
-                ResendWorker.RESEND_TIMEOUT_MS,
-                TimeUnit.MILLISECONDS));
-        handlers.add(scheduler.schedule(
-                listener,
-                0,
-                TimeUnit.MILLISECONDS
-        ));
+        generalHandlers.add(
+                scheduler.scheduleAtFixedRate(
+                        new UIWorker(this),
+                        0,
+                        UI_REFRESH_RATE_MS,
+                        TimeUnit.MILLISECONDS
+                )
+        );
+        generalHandlers.add(
+                scheduler.scheduleWithFixedDelay(
+                        new InputWorker(this, config.getKeyConfig()),
+                        0,
+                        UI_REFRESH_RATE_MS,
+                        TimeUnit.MILLISECONDS
+                )
+        );
+        generalHandlers.add(
+                scheduler.scheduleWithFixedDelay(
+                        new ActualizeWorker(this),
+                        0,
+                        MetaEngine.GAME_KEEP_ALIVE_MS,
+                        TimeUnit.MILLISECONDS
+                )
+        );
+        generalHandlers.add(
+                scheduler.scheduleWithFixedDelay(
+                        new ResendWorker(communicator),
+                        0,
+                        ResendWorker.RESEND_TIMEOUT_MS,
+                        TimeUnit.MILLISECONDS
+                )
+        );
+        generalHandlers.add(
+                scheduler.schedule(
+                        listener,
+                        0,
+                        TimeUnit.MILLISECONDS
+                )
+        );
     }
 
     public GameManager(PluggableUI ui, GameConfig config) throws IOException {
@@ -91,7 +108,8 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     @Override
     public void close() throws IOException {
-        handlers.forEach(h -> h.cancel(true));
+        stopGame();
+        generalHandlers.forEach(h -> h.cancel(true));
         listener.close();
         communicator.close();
         scheduler.shutdown();
@@ -126,24 +144,32 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     @Override
     public void stopGame() {
-        currentGame.cancel(true);
-        currentEngine = null;
+        // become viewer
+        currentEngine.setSelfRole(SnakesProto.NodeRole.VIEWER);
+        synchronizer.setRole(SnakesProto.NodeRole.VIEWER);
+        gameHandlers.forEach(h -> log.info(h.cancel(true)));
+        gameHandlers.clear();
+        //log.info("cancelled");
     }
 
     private void spinAnnouncer() {
-        handlers.add(scheduler.scheduleAtFixedRate(
-                new AnnounceWorker(this, localPlayer, communicator),
-                0,
-                1,
-                TimeUnit.SECONDS));
+        generalHandlers.add(
+                scheduler.scheduleAtFixedRate(
+                        new AnnounceWorker(this, communicator),
+                        0,
+                        1,
+                        TimeUnit.SECONDS)
+        );
     }
 
     private void spinEngine(Integer stateDelay) {
-        handlers.add(scheduler.scheduleAtFixedRate(
-                new EngineWorker(currentEngine),
-                0,
-                stateDelay,
-                TimeUnit.MILLISECONDS));
+        generalHandlers.add(
+                scheduler.scheduleAtFixedRate(
+                        new EngineWorker(currentEngine),
+                        0,
+                        stateDelay,
+                        TimeUnit.MILLISECONDS)
+        );
     }
 
     MetaEngineDTO getMetaDTO() {

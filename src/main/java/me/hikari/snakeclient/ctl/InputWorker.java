@@ -48,6 +48,12 @@ class InputWorker implements Runnable {
         if(c == keys.getStop()){
             if(!state.isScreenMain()) {
                 manager.stopGame();
+            }
+        }
+
+        if(c == keys.getRet()){
+            if(!state.isScreenMain()) {
+                manager.stopGame();
                 state.switchActiveScreen();
             }
         }
