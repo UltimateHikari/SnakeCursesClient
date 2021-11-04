@@ -285,6 +285,10 @@ class GameManager implements InputDelegate, MessageDelegate {
         }
     }
 
+    @Override
+    public boolean isMaster() {
+        return synchronizer.getRole().equals(SnakesProto.NodeRole.MASTER);
+    }
 
     @Override
     public KeyStroke getInput() throws IOException {

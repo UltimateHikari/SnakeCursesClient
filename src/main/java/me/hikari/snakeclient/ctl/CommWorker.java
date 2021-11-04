@@ -26,6 +26,7 @@ class NodeInfo {
     private InetSocketAddress addr;
     private Long lastSentTime;
     private Long lastRecvTime;
+    private Long lastStateTime;
 }
 
 
@@ -68,7 +69,10 @@ class CommWorker implements Runnable, Communicator, Sender {
     void actualizeNodes() throws IOException {
         var time = System.currentTimeMillis();
         if (master != null) {
-            if (time - master.getLastRecvTime() > engineConfig.getNodeTimeoutMs()) {
+            boolean recvTimeout = time - master.getLastRecvTime() > engineConfig.getNodeTimeoutMs();
+            // relying on NodeTimeout >> StateDelay
+            boolean stateTimeout = time - master.getLastStateTime() > engineConfig.getNodeTimeoutMs();
+            if (recvTimeout || stateTimeout) {
                 manager.masterFailed();
             } else {
                 if (time - master.getLastSentTime() > engineConfig.getPingDelayMs()) {
@@ -103,6 +107,7 @@ class CommWorker implements Runnable, Communicator, Sender {
                 }
                 var msg = NetUtils.tryDeserializeGameMessage(packet);
                 handleMsg(msg, packet);
+                updateLastRecv((InetSocketAddress) packet.getSocketAddress());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -143,6 +148,7 @@ class CommWorker implements Runnable, Communicator, Sender {
     private void handleState(SnakesProto.GameMessage msg, DatagramPacket packet) throws IOException {
         manager.handleStateMsg(msg.getState().getState());
         updateMaster(packet);
+        updateMasterState(packet);
         sendAck(msg, packet);
     }
 
@@ -198,6 +204,7 @@ class CommWorker implements Runnable, Communicator, Sender {
         resender.bufferSentMessage(msg, packet, msg_seq);
         msg_seq++;
         socket.send(packet);
+        updateLastSent(addr);
     }
 
     @Override
@@ -221,18 +228,51 @@ class CommWorker implements Runnable, Communicator, Sender {
         socket.send(packet);
     }
 
+    @Synchronized("nodeInfoLock")
+    private void updateLastRecv(InetSocketAddress addr){
+        var time = System.currentTimeMillis();
+        if(master != null && master.getAddr().equals(addr)){
+            master.setLastRecvTime(time);
+        }
+        if(deputy != null && deputy.getAddr().equals(addr)){
+            deputy.setLastRecvTime(time);
+        }
+    }
+
+    @Synchronized("nodeInfoLock")
+    private void updateLastSent(InetSocketAddress addr){
+        var time = System.currentTimeMillis();
+        if(master != null && master.getAddr().equals(addr)){
+            master.setLastSentTime(time);
+        }
+        if(deputy != null && deputy.getAddr().equals(addr)){
+            deputy.setLastSentTime(time);
+        }
+    }
+
     private void updateMaster(DatagramPacket packet) {
         updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
+    }
+    private void updateMasterState(DatagramPacket packet) {
+        var potentialMaster = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
+        if(potentialMaster.equals(master.getAddr())){
+            master.setLastStateTime(System.currentTimeMillis());
+        }
     }
 
     @Override
     @Synchronized("nodeInfoLock")
     public void updateMaster(InetSocketAddress addr) {
-        if (master != null) {
-            resender.changeMasterInBufferedDatagrams(master.getAddr(), addr);
-        }
         var time = System.currentTimeMillis();
-        master = new NodeInfo(addr, time, time);
+        var newMaster = new NodeInfo(addr, time, time, 0L);
+        if (master != null) {
+            if(!(master.getAddr().equals(addr))) {
+                resender.changeMasterInBufferedDatagrams(master.getAddr(), addr);
+                master = newMaster;
+            }
+        }else {
+            master = newMaster;
+        }
     }
 
     @Override
@@ -245,8 +285,9 @@ class CommWorker implements Runnable, Communicator, Sender {
     @Override
     @Synchronized("nodeInfoLock")
     public void updateDeputy(InetSocketAddress addr) {
+
         var time = System.currentTimeMillis();
-        deputy = new NodeInfo(addr, time, time);
+        deputy = new NodeInfo(addr, time, time, 0L);
     }
 
     public void close() {
