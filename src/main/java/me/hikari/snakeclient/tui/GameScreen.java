@@ -66,7 +66,7 @@ class GameScreen {
         tg.putString(pos, "Highscores");
         TuiUtils.clearRectangleByBorder(tg, pos, grid.getScoreSize(size));
         Player[] sPlayers = players.stream()
-                .sorted(Comparator.comparing(Player::getScore))
+                .sorted(Comparator.comparing(Player::getScore).reversed())
                 .toArray(Player[]::new);
         for (int i = 0; i < sPlayers.length; i++) {
             tg.setForegroundColor(brush.getColor(sPlayers[i]));
