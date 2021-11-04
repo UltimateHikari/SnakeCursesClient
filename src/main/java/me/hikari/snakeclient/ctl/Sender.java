@@ -2,7 +2,6 @@ package me.hikari.snakeclient.ctl;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.SocketAddress;
 
 /**
  * CommWorker as seen from Resender perspective

@@ -1,13 +1,8 @@
 package me.hikari.snakeclient.ctl;
 
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
-import me.hikari.snakeclient.data.Peer;
-import me.hikari.snakeclient.data.Player;
-import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;

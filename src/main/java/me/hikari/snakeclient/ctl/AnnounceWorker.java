@@ -1,7 +1,6 @@
 package me.hikari.snakeclient.ctl;
 
 import lombok.RequiredArgsConstructor;
-import me.hikari.snakeclient.data.Player;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;

@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
-import me.hikari.snakeclient.data.Peer;
-import me.hikari.snakeclient.data.Player;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
@@ -16,8 +14,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.LinkedList;
-import java.util.List;
 
 @Getter
 @Setter
