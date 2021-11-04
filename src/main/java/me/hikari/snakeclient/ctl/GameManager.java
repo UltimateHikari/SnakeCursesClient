@@ -31,7 +31,6 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     private final GameConfig config;
     private Engine currentEngine = null;
-    private final Player localPlayer;
     private final MetaEngine gameList;
     @Getter
     private final PluggableUI ui;
@@ -86,8 +85,12 @@ class GameManager implements InputDelegate, MessageDelegate {
     public GameManager(PluggableUI ui, GameConfig config) throws IOException {
         this.ui = ui;
         this.config = config;
-        this.localPlayer = new Player(config.getPlayerConfig());
-        this.gameList = new MetaEngine(new GameEntry(localPlayer, config.getEngineConfig()));
+        this.gameList = new MetaEngine(
+                new GameEntry(
+                        new Player(config.getPlayerConfig()),
+                        config.getEngineConfig()
+                )
+        );
         this.listener = new ListenWorker(this, config.getNetConfig());
         this.communicator = new CommWorker(
                 this,
@@ -119,14 +122,17 @@ class GameManager implements InputDelegate, MessageDelegate {
     @Override
     public void startGame() throws IOException {
         var entry = gameList.getSelectedEntry();
-        localPlayer.reset();
-        currentEngine = new Engine(entry, localPlayer, communicator);
+        currentEngine = new Engine(
+                entry,
+                new Player(config.getPlayerConfig()),
+                communicator
+        );
         if (entry.getJoinAddress() != null) {
             // async wait for join
             // (communicator will call join() on ack)
             currentEngine.setSelfRole(SnakesProto.NodeRole.NORMAL);
             var joinMsg = SnakesProto.GameMessage.JoinMsg.newBuilder()
-                    .setName(localPlayer.getName())
+                    .setName(config.getPlayerConfig().getName())
                     .build();
             var msg = SnakesProto.GameMessage.newBuilder()
                     .setJoin(joinMsg)
@@ -185,7 +191,7 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     @Override
     public void joinAsNormal(Integer receiverID) {
-        localPlayer.become(receiverID);
+        currentEngine.selfBecome(receiverID);
         synchronizer.setRole(SnakesProto.NodeRole.NORMAL);
     }
 
@@ -214,7 +220,7 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     @Override
     public Integer getLocalID() {
-        return localPlayer.getId();
+        return currentEngine.getSelfId();
     }
 
     @Override
@@ -266,14 +272,14 @@ class GameManager implements InputDelegate, MessageDelegate {
 
     @Override
     public void masterFailed() throws IOException {
-        if (localPlayer.getRole() == SnakesProto.NodeRole.DEPUTY) {
-            currentEngine.setSelfRole(SnakesProto.NodeRole.MASTER);
-            synchronizer.setRole(SnakesProto.NodeRole.MASTER);
-            currentEngine.propagateNewMaster();
-            // engine is already spinned
-        }
-        if (localPlayer.getRole() == SnakesProto.NodeRole.NORMAL) {
-            communicator.updateMasterToDeputy();
+        switch (currentEngine.getSelfRole()) {
+            case DEPUTY -> {
+                currentEngine.setSelfRole(SnakesProto.NodeRole.MASTER);
+                synchronizer.setRole(SnakesProto.NodeRole.MASTER);
+                currentEngine.propagateNewMaster();
+                // engine is already spinned
+            }
+            case NORMAL -> communicator.updateMasterToDeputy();
         }
     }
 

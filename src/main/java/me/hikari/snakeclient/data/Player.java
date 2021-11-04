@@ -21,6 +21,7 @@ public class Player {
     private final String ip;
     private final Integer port;
     @Setter
+    @EqualsAndHashCode.Exclude
     private SnakesProto.NodeRole role;
     @EqualsAndHashCode.Exclude
     private Integer score;

@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
 import me.hikari.snakeclient.ctl.Communicator;
-import me.hikari.snakeclient.ctl.Game;
 import me.hikari.snakeclient.data.config.EngineConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -79,6 +77,18 @@ public class Engine {
     @Synchronized("stateLock")
     public void setSelfRole(SnakesProto.NodeRole role) {
         localPlayer.setRole(role);
+    }
+
+    public void selfBecome(Integer receiverID) {
+        localPlayer.become(receiverID);
+    }
+
+    public Integer getSelfId() {
+        return localPlayer.getId();
+    }
+
+    public SnakesProto.NodeRole getSelfRole() {
+        return localPlayer.getRole();
     }
 
     @AllArgsConstructor
@@ -215,7 +225,7 @@ public class Engine {
                     .setRoleChange(role)
                     .buildPartial();
             communicator.sendMessage(msg, player.formAddress());
-            // a little preemptive, he can ignore rolechange
+            // a little preemptive, he can ignore roleChange
             // and ideally should do this in ack
             communicator.updateDeputy(player.formAddress());
             return Optional.of(player);
@@ -274,12 +284,13 @@ public class Engine {
                     .stream().map(Coord::new).toList();
             this.players = gameState
                     .getPlayers().getPlayersList()
-                    .stream().map(Player::new).toList();
+                    .stream().map(Player::new).collect(Collectors.toCollection(ArrayList<Player>::new));
             this.snakes = gameState
                     .getSnakesList()
                     .stream().map(Snake::new).collect(Collectors.toCollection(LinkedList<Snake>::new));
             this.config = new EngineConfig(gameState.getConfig());
             this.isLatest = false;
+            reconnectLocalPlayers();
         }
     }
 
@@ -361,4 +372,8 @@ public class Engine {
         }
     }
 
+
+    public void reconnectLocalPlayers(){
+        players.replaceAll(p -> p.equals(localPlayer) ? localPlayer : p);
+    }
 }
