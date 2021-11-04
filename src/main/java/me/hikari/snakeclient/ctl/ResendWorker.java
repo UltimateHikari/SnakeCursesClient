@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 @Log4j2
 class ResendWorker implements Runnable, Resender {
+    private static final Long MAX_RESENDS = 3L;
     private final Object buffersLock = new Object();
     public final static Integer RESEND_TIMEOUT_MS = 20;
     private final Sender communicator;
@@ -53,15 +54,16 @@ class ResendWorker implements Runnable, Resender {
     }
 
     public void resendAll() {
-        var time = System.currentTimeMillis();
         datagrams.forEach((k, v) -> {
-            if (time - v > RESEND_TIMEOUT_MS) {
-                try {
+            try {
+                if (v < MAX_RESENDS) {
                     resend(k);
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                } else {
+                    communicator.noteFailed(k);
                 }
-                // TODO add remove if too many resends
+            } catch (IOException e) {
+                log.error(e.getStackTrace());
             }
         });
     }

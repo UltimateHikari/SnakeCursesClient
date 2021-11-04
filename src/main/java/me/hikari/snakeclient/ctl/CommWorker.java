@@ -107,7 +107,7 @@ class CommWorker implements Runnable, Communicator, Sender {
                 }
                 var msg = NetUtils.tryDeserializeGameMessage(packet);
                 handleMsg(msg, packet);
-                updateLastRecv((InetSocketAddress) packet.getSocketAddress());
+                updateLastRecv(NetUtils.packet2addr(packet));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -140,7 +140,7 @@ class CommWorker implements Runnable, Communicator, Sender {
             var errMsg = SnakesProto.GameMessage.ErrorMsg.newBuilder()
                     .setErrorMessage(e.getMessage()).build();
             var finalErrMsg = SnakesProto.GameMessage.newBuilder().setError(errMsg).buildPartial();
-            sendMessage(finalErrMsg, (InetSocketAddress) packet.getSocketAddress());
+            sendMessage(finalErrMsg, NetUtils.packet2addr(packet));
         }
         sendAckVerbose(msg, packet, receiverID);
     }
@@ -197,6 +197,17 @@ class CommWorker implements Runnable, Communicator, Sender {
         socket.send(p);
     }
 
+    @Override
+    public void noteFailed(DatagramPacket packet) throws IOException {
+        var addr = NetUtils.packet2addr(packet);
+        if(master != null && addr.equals(master.getAddr())){
+            manager.masterFailed();
+        }
+        if(deputy != null && addr.equals(deputy.getAddr())){
+            manager.deputyFailed();
+        }
+    }
+
     public void sendMessage(SnakesProto.GameMessage msg, InetSocketAddress addr) throws IOException {
         SnakesProto.GameMessage finalMsg = msg.toBuilder().setMsgSeq(msg_seq).build();
         var buf = NetUtils.serializeGameMessageBuf(finalMsg.toByteArray(), config);
@@ -251,11 +262,10 @@ class CommWorker implements Runnable, Communicator, Sender {
     }
 
     private void updateMaster(DatagramPacket packet) {
-        updateMaster(new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort()));
+        updateMaster(NetUtils.packet2addr(packet));
     }
     private void updateMasterState(DatagramPacket packet) {
-        var potentialMaster = new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
-        if(potentialMaster.equals(master.getAddr())){
+        if(NetUtils.packet2addr(packet).equals(master.getAddr())){
             master.setLastStateTime(System.currentTimeMillis());
         }
     }

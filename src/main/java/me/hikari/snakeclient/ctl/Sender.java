@@ -2,6 +2,7 @@ package me.hikari.snakeclient.ctl;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.SocketAddress;
 
 /**
  * CommWorker as seen from Resender perspective
@@ -11,4 +12,6 @@ interface Sender {
     void bindResender(Resender resendWorker);
 
     void send(DatagramPacket p) throws IOException;
+
+    void noteFailed(DatagramPacket packet) throws IOException;
 }

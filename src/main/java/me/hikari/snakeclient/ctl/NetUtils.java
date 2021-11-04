@@ -6,6 +6,7 @@ import me.hikari.snakeclient.data.config.NetConfig;
 import me.hikari.snakes.SnakesProto;
 
 import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 class NetUtils {
@@ -26,5 +27,9 @@ class NetUtils {
 
     public static Peer getPeer(DatagramPacket packet) {
         return new Peer(packet.getAddress().getHostAddress(), packet.getPort());
+    }
+
+    public static InetSocketAddress packet2addr(DatagramPacket packet){
+        return new InetSocketAddress(packet.getAddress().getHostAddress(), packet.getPort());
     }
 }
