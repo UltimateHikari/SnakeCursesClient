@@ -30,6 +30,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
             formConfigPath(args[0]);
+        }else{
+            log.info("No config provided");
+            System.exit(-1);
         }
         var config = parseConfig();
         Tui tui = new Tui(config.getKeyConfig());

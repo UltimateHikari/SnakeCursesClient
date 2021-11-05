@@ -97,5 +97,6 @@ class GameScreen {
         } else {
             tg.putString(TuiUtils.center(pos, size, footer.length()), footer);
         }
+        screen.setCursorPosition(TuiUtils.shift(pos, 0));
     }
 }
