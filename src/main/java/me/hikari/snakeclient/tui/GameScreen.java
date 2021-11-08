@@ -43,7 +43,7 @@ class GameScreen {
         var viewSize = TuiUtils.tryShrinkSize(TuiUtils.removeBorder(border), dto.getConfig().getWorldSize());
         TuiUtils.drawFancyBoundary(tg, pos, TuiUtils.addBorder(viewSize));
         tg.putString(pos, "Field");
-
+        TuiUtils.clearRectangleByBorder(tg, pos, viewSize);
         tg.drawImage(pos.withRelative(IMAGE_SHIFT), converter.dto2image(dto, viewSize, brush));
     }
 

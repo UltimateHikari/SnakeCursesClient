@@ -173,7 +173,7 @@ public class Engine {
         var field = new FieldRepresentation(config.getWorldSize(), foods);
         snakes.forEach(s -> s.showYourself(field::putSnakeCell, config.getWorldSize()));
         var r = new Random();
-        while (foods.size() < config.getFoodStatic()) {
+        while (foods.size() < config.getFoodStatic() + config.getFoodPerPlayer()*players.size()) {
             //potential problems if almost whole field is snake
             var c = new Coord(
                     r.nextInt(config.getWorldSize().getX()),
